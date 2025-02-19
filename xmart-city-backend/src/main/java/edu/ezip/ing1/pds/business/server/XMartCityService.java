@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 //import edu.ezip.ing1.pds.business.dto.Students;
 import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
+import edu.ezip.ing1.pds.business.dto.Capteur;
+import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.commons.Response;
 import org.slf4j.Logger;
@@ -35,6 +37,16 @@ public class XMartCityService {
         }
     }
 
+    private enum Queries1 {
+        SELECT_ALL_CAPTEURS("SELECT t.type, t.statut, t.id FROM capteur t"),
+        INSERT_CAPTEUR("INSERT into capteurs (type, statut, id) values (?, ?, ?)");
+        private final String query1;
+
+        private Queries1(final String query) {
+            this.query1 = query;
+        }
+    }
+
     public static XMartCityService inst = null;
     public static final XMartCityService getInstance()  {
         if(inst == null) {
@@ -59,6 +71,26 @@ public class XMartCityService {
                 break;
             case INSERT_UTILISATEUR:
                 response = insertUtilisateur(request, connection);
+                break;
+            default:
+                break;
+        }
+
+        return response;
+    }
+
+    public final Response dispatchUn(final Request request, final Connection connection)
+            throws InvocationTargetException, IllegalAccessException, SQLException, IOException {
+        Response response = null;
+
+        final Queries1 queryEnum = Enum.valueOf(Queries1.class, request.getRequestOrder());
+        switch(queryEnum) {
+
+            case SELECT_ALL_CAPTEURS:
+                response = selectAllCapteurs(request, connection);
+                break;
+            case INSERT_CAPTEUR:
+                response = insertCapteur(request, connection);
                 break;
             default:
                 break;
@@ -108,6 +140,25 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateur));
     }
 
+    private Response insertCapteur(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Capteur capteur = objectMapper.readValue(request.getRequestBody(), Capteur.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries1.INSERT_CAPTEUR.query1);
+        stmt.setString(1, capteur.getType());
+        stmt.setString(2, capteur.getStatut());
+        stmt.setString(3, capteur.getId());
+        stmt.executeUpdate();
+
+        final Statement stmt2 = connection.createStatement();
+        final ResultSet res = stmt2.executeQuery("SELECT LAST_INSERT_ID()");
+        res.next();
+
+        capteur.setId(res.getString(1));
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteur));
+    }
+
 
     /*private Response SelectAllUsers(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
        final ObjectMapper objectMapper = new ObjectMapper();
@@ -140,6 +191,21 @@ public class XMartCityService {
             utilisateurs.add(utilisateur);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateurs));
+    }
+
+    private Response selectAllCapteurs(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries1.SELECT_ALL_CAPTEURS.query1);
+        Capteurs capteurs = new Capteurs();
+        while (res.next()) {
+            Capteur capteur = new Capteur();
+            capteur.setType(res.getString(1));
+            capteur.setStatut(res.getString(2));
+            capteur.setId(res.getString(3));
+            capteurs.add(capteur);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteurs));
     }
 
 }

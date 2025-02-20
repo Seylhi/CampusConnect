@@ -1,4 +1,4 @@
-/*package edu.ezip.ing1.pds.business.dto;
+package edu.ezip.ing1.pds.business.dto;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonRootName;

@@ -8,6 +8,8 @@ import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
 import edu.ezip.ing1.pds.business.dto.Capteur;
 import edu.ezip.ing1.pds.business.dto.Capteurs;
+import edu.ezip.ing1.pds.business.dto.Reservation;
+import edu.ezip.ing1.pds.business.dto.Reservations;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.commons.Response;
 import org.slf4j.Logger;
@@ -44,6 +46,16 @@ public class XMartCityService {
 
         private Queries1(final String query) {
             this.query1 = query;
+        }
+    }
+
+    private enum Queries2 {
+        SELECT_ALL_RESERVATIONS("SELECT t.id, t.name, t.date, t.heuredeb, t.heurefin, t.type, t.description FROM reservation t"),
+        INSERT_RESERVATION("INSERT INTO Reservations (id, name, date, heuredeb, heurefin, type, description) VALUES (?, ?, ?, ?, ?, ?, ?)");
+        private final String query2;
+
+        private Queries2(final String query) {
+            this.query2 = query;
         }
     }
 
@@ -90,6 +102,26 @@ public class XMartCityService {
                 response = selectAllCapteurs(request, connection);
                 break;
             case INSERT_CAPTEUR:
+                response = insertCapteur(request, connection);
+                break;
+            default:
+                break;
+        }
+
+        return response;
+    }
+
+    public final Response dispatchDeux(final Request request, final Connection connection)
+            throws InvocationTargetException, IllegalAccessException, SQLException, IOException {
+        Response response = null;
+
+        final Queries2 queryEnum = Enum.valueOf(Queries2.class, request.getRequestOrder());
+        switch(queryEnum) {
+
+            case SELECT_ALL_RESERVATIONS:
+                response = selectAllCapteurs(request, connection);
+                break;
+            case INSERT_RESERVATION:
                 response = insertCapteur(request, connection);
                 break;
             default:
@@ -159,6 +191,29 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteur));
     }
 
+    private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries2.INSERT_RESERVATION.query2);
+        stmt.setString(1, reservation.getId());
+        stmt.setString(2, reservation.getName());
+        stmt.setString(3, String.valueOf(reservation.getDate()));
+        stmt.setString(4, String.valueOf(reservation.getHeuredeb()));
+        stmt.setString(5, String.valueOf(reservation.getHeurefin()));
+        stmt.setString(6, reservation.getType());
+        stmt.setString(7, reservation.getDescription());
+        stmt.executeUpdate();
+
+        final Statement stmt2 = connection.createStatement();
+        final ResultSet res = stmt2.executeQuery("SELECT LAST_INSERT_ID()");
+        res.next();
+
+        reservation.setId(res.getString(1));
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(reservation));
+    }
+
 
     /*private Response SelectAllUsers(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
        final ObjectMapper objectMapper = new ObjectMapper();
@@ -206,6 +261,25 @@ public class XMartCityService {
             capteurs.add(capteur);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteurs));
+    }
+
+    private Response selectAllReservations(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Statement stmt = connection.createStatement();
+        final ResultSet res = stmt.executeQuery(Queries2.SELECT_ALL_RESERVATIONS.query2);
+        Reservations reservations = new Reservations();
+        while (res.next()) {
+            Reservation reservation = new Reservation();
+            reservation.setId(res.getString(1));
+            reservation.setName(res.getString(2));
+            reservation.setDate(Date.valueOf(res.getString(3)));
+            reservation.setHeuredeb(Time.valueOf(res.getString(4)));
+            reservation.setHeurefin(Time.valueOf(res.getString(5)));
+            reservation.setType(res.getString(6));
+            reservation.setDescription(res.getString(7));
+            reservations.add(reservation);
+        }
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(reservations));
     }
 
 }

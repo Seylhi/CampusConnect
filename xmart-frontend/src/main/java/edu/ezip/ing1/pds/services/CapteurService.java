@@ -63,7 +63,7 @@ public class CapteurService {
             final Capteur cp = (Capteur)clientRequest.getInfo();
             logger.debug("Thread {} complete : {} {} {} --> {}",
                     clientRequest.getThreadName(),
-                    cp.getType(), cp.getStatut(), cp.getId(),
+                    cp.getId(),
                     clientRequest.getResult());
         }
     }

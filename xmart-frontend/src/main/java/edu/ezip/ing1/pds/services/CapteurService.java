@@ -3,16 +3,12 @@ package edu.ezip.ing1.pds.services;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import edu.ezip.commons.LoggingUtils;
-import edu.ezip.ing1.pds.business.dto.Student;
-import edu.ezip.ing1.pds.business.dto.Students;
 import edu.ezip.ing1.pds.business.dto.Capteur;
 import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.InsertStudentsClientRequest;
-import edu.ezip.ing1.pds.requests.SelectAllStudentsClientRequest;
 import edu.ezip.ing1.pds.requests.InsertCapteursClientRequest;
 import edu.ezip.ing1.pds.requests.SelectAllCapteursClientRequest;
 import org.slf4j.Logger;
@@ -27,7 +23,7 @@ import java.util.UUID;
 public class CapteurService {
     private final static String LoggingLabel = "FrontEnd - CapteurService";
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
-    private final static String capteurToBeInserted = "capteurs-to-be-inserted.yaml";
+    private final static String capteursToBeInserted = "capteurs-to-be-inserted.yaml";
 
     final String insertRequestOrder = "INSERT_CAPTEUR";
     final String selectRequestOrder = "SELECT_ALL_CAPTEURS";
@@ -40,12 +36,12 @@ public class CapteurService {
 
     public void insertCapteurs() throws InterruptedException, IOException {
         final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
-        final Capteurs guys = ConfigLoader.loadConfig(Capteurs.class, capteursToBeInserted);
+        final Capteurs cps = ConfigLoader.loadConfig(Capteurs.class, capteursToBeInserted);
 
         int birthdate = 0;
-        for(final Capteur guy : guys.getCapteurs()) {
+        for(final Capteurs cp : cps.getCapteurs()) {
             final ObjectMapper objectMapper = new ObjectMapper();
-            final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(guy);
+            final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cp);
             logger.trace("Capteur with its JSON face : {}", jsonifiedGuy);
             final String requestId = UUID.randomUUID().toString();
             final Request request = new Request();
@@ -57,17 +53,17 @@ public class CapteurService {
 
             final InsertCapteursClientRequest clientRequest = new InsertCapteursClientRequest(
                     networkConfig,
-                    birthdate++, request, guy, requestBytes);
+                    birthdate++, request, cp, requestBytes);
             clientRequests.push(clientRequest);
         }
 
         while (!clientRequests.isEmpty()) {
             final ClientRequest clientRequest = clientRequests.pop();
             clientRequest.join();
-            final Capteur guy = (Capteur)clientRequest.getInfo();
+            final Capteur cp = (Capteur)clientRequest.getInfo();
             logger.debug("Thread {} complete : {} {} {} --> {}",
                     clientRequest.getThreadName(),
-                    guy.getType(), guy.getStatut(), guy.getId(),
+                    cp.getType(), cp.getStatut(), cp.getId(),
                     clientRequest.getResult());
         }
     }

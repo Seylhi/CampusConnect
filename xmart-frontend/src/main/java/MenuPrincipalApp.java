@@ -31,7 +31,7 @@ public class MenuPrincipalApp {
     }
 
     private static void creerInterface() {
-        JFrame frame = new JFrame("Gestion des Capteurs");
+        JFrame frame = new JFrame("CampusConnect");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);

@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds.requests;
+/*package edu.ezip.ing1.pds.requests;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.ezip.ing1.pds.business.dto.Student;
@@ -24,4 +24,4 @@ public class InsertStudentsClientRequest extends ClientRequest<Student, String> 
         final String result  = studentIdMap.get("student_id").toString();
         return result;
     }
-}
+}*/

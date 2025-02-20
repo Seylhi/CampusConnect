@@ -190,20 +190,20 @@ public class MenuPrincipalApp {
 
         JButton btnCapteur = new JButton("Capteur");
         btnCapteur.addActionListener(e -> CapteurIHM());
-        JButton btnRadiateur = new JButton("Radiateur");
-        btnRadiateur.addActionListener(e -> RadiateurIHM());
+       /* JButton btnRadiateur = new JButton("Radiateur");
+        btnRadiateur.addActionListener(e -> RadiateurIHM());*/
         JButton btnQuitter = new JButton("Quitter");
         btnQuitter.addActionListener(e -> frame.dispose());
 
         panel.add(btnCapteur);
-        panel.add(btnRadiateur);
+        //panel.add(btnRadiateur);
         panel.add(btnQuitter);
 
         frame.add(panel);
         frame.setVisible(true);
     }
 
-    private static void RadiateurIHM() {
+    /*private static void RadiateurIHM() {
         JFrame frame = new JFrame("Radiateur");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -245,7 +245,7 @@ public class MenuPrincipalApp {
 
         frame.setVisible(true);
 
-    }
+    }*/
 
     private static void CapteurIHM() {
         JFrame frame = new JFrame("Capteur");
@@ -447,7 +447,7 @@ public class MenuPrincipalApp {
         frame.setVisible(true);
     }
 
-    private static void reglerTemperatureIHM() {
+   /* private static void reglerTemperatureIHM() {
         JFrame frame = new JFrame("Régler Température");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -498,7 +498,7 @@ public class MenuPrincipalApp {
 
         frame.setVisible(true);
 
-    }
+    }*/
 
     private static Capteur chercherAppareilParNom(String nom) {
         for (Capteur appareil : appareils) {
@@ -557,7 +557,7 @@ public class MenuPrincipalApp {
     }
 
 
-    private static void afficherConsommationIHM() {
+    /*private static void afficherConsommationIHM() {
         // Fenêtre pour afficher la consommation
         JFrame frame = new JFrame("Consommation des radiateurs dans chaque salle");
         frame.setSize(500, 300);
@@ -589,10 +589,10 @@ public class MenuPrincipalApp {
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
-    }
+    }*/
 
 
-    private static void detecterProblemeIHM() {
+    /*private static void detecterProblemeIHM() {
         // Fenêtre pour afficher l'état du problème
         JFrame frame = new JFrame("Détection de Problème");
         frame.setSize(500, 250);
@@ -644,7 +644,7 @@ public class MenuPrincipalApp {
 
         frame.setVisible(true);
         frame.setVisible(true);
-    }
+    }*/
 
     private static void ajouterPlanificationIHM() {
         // Fenêtre pour ajouter une planification

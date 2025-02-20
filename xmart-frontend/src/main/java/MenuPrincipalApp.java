@@ -1,13 +1,20 @@
+import com.toedter.calendar.JDateChooser;
+
 import javax.swing.*;
 import java.awt.*;
 import java.io.*;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
+
 
 public class MenuPrincipalApp {
     private static String nomFichier = "accounts.log";
     private static ArrayList<Capteur> appareils = new ArrayList<>();
+    private static List<Reservation> reservations = new ArrayList<>();
+
 
     public static void main(String[] args) {
         // Ajout des appareils connectés
@@ -190,20 +197,126 @@ public class MenuPrincipalApp {
 
         JButton btnCapteur = new JButton("Capteur");
         btnCapteur.addActionListener(e -> CapteurIHM());
-       /* JButton btnRadiateur = new JButton("Radiateur");
+        JButton btnReservation = new JButton("Réservation d'une salle");
+        btnReservation.addActionListener(e -> ReservationIHM());
+        /*JButton btnRadiateur = new JButton("Radiateur");
         btnRadiateur.addActionListener(e -> RadiateurIHM());*/
         JButton btnQuitter = new JButton("Quitter");
         btnQuitter.addActionListener(e -> frame.dispose());
 
         panel.add(btnCapteur);
         //panel.add(btnRadiateur);
+        panel.add(btnReservation);
         panel.add(btnQuitter);
 
         frame.add(panel);
         frame.setVisible(true);
     }
 
-    /*private static void RadiateurIHM() {
+    private static void ReservationIHM() {
+// Fenêtre pour ajouter une planification
+        JFrame frame = new JFrame("Réservation d'une salle");
+        frame.setSize(450, 450);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(9, 2, 10, 10));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        // Ajout des composants
+        JLabel labellibelle = new JLabel("Libellé :");
+        final String libelle[] = {"Examen","Etudes", "Hackaton", "Partiels", "Projet Sirius"};
+        JComboBox<String> combolibelle = new JComboBox<>(libelle);
+        panel.add(labellibelle);
+        panel.add(combolibelle);
+
+        JLabel labelsalle = new JLabel("Nom de la salle :");
+        final String salle[] = { "INFO1", "INFO2","INFO3","TD1","TD2", "TD3","TD5"};
+        JComboBox<String> combosalle = new JComboBox<>(salle);
+        panel.add(labelsalle);
+        panel.add(combosalle);
+
+        JLabel labeldescription = new JLabel("Description :");
+        JTextField txtDescription = new JTextField();
+        panel.add(labeldescription);
+        panel.add(txtDescription);
+
+        JLabel labeldate = new JLabel("Date de la réservation :");
+        JDateChooser dateresa = new JDateChooser();
+        panel.add(labeldate);
+        panel.add(dateresa);
+
+        JLabel labelheuredeb = new JLabel("Heure de début (format HH:mm) :");
+        JTextField txtheuredeb = new JTextField();
+        panel.add(labelheuredeb);
+        panel.add(txtheuredeb);
+
+        JLabel labelheurefin = new JLabel("Heure de fin (format HH:mm) :");
+        JTextField txtheurefin = new JTextField();
+        panel.add(labelheurefin);
+        panel.add(txtheurefin);
+
+        JButton btnAfficherPlanificationSalle = new JButton("Réservations existantes");
+        btnAfficherPlanificationSalle.addActionListener(e -> afficherReservationsIHM());
+        panel.add(btnAfficherPlanificationSalle);
+
+        JButton btnAjouter = new JButton("Ajouter");
+        JButton btnRetour = new JButton("Retour");
+        btnRetour.addActionListener(e -> frame.dispose());
+
+        btnAjouter.addActionListener(e -> {
+            String libel = combolibelle.getSelectedItem().toString();
+            String nom = combosalle.getSelectedItem().toString();
+            String description = txtDescription.getText();
+            Date date = dateresa.getDate(); // Récupérer la date correctement
+            String heuredeb = txtheuredeb.getText();
+            String heurefin = txtheurefin.getText();
+
+            if (date == null || heuredeb.isEmpty() || heurefin.isEmpty() || description.isEmpty()) {
+                JOptionPane.showMessageDialog(frame, "Veuillez remplir tous les champs s'il vous plaît", "Erreur", JOptionPane.ERROR_MESSAGE);
+                return;
+            }
+
+            try {
+                // Ajouter la réservation à la liste
+                Reservation nouvelleReservation = new Reservation(libel, nom, description, date, heuredeb, heurefin, "Nom utilisateur");
+                reservations.add(nouvelleReservation);
+
+                // Message de confirmation
+                String message = String.format(
+                        "Réservation ajoutée pour la salle %s (%s) :\n" +
+                                "Libellé : %s\n" +
+                                "Description : %s\n" +
+                                "Date : %s\n" +
+                                "Heure de début : %s\n" +
+                                "Heure de fin : %s",
+                        nom, libel, libel, description, date.toString(), heuredeb, heurefin
+                );
+
+                JOptionPane.showMessageDialog(frame, message);
+
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Une erreur est survenue.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(btnAjouter);
+        buttonPanel.add(btnRetour);
+
+        frame.add(panel, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        btnAfficherPlanificationSalle.addActionListener(e -> afficherReservationsIHM());
+        btnRetour.addActionListener(e -> frame.dispose());
+
+
+        frame.setVisible(true);
+
+    }
+
+   /* private static void RadiateurIHM() {
         JFrame frame = new JFrame("Radiateur");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -447,7 +560,7 @@ public class MenuPrincipalApp {
         frame.setVisible(true);
     }
 
-   /* private static void reglerTemperatureIHM() {
+    /*private static void reglerTemperatureIHM() {
         JFrame frame = new JFrame("Régler Température");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -510,7 +623,7 @@ public class MenuPrincipalApp {
     }
 
 
-    private static void afficherPlanificationIHM() {
+   /* private static void afficherPlanificationIHM() {
         // Fenêtre pour afficher la planification
         JFrame frame = new JFrame("Planification des radiateurs");
         frame.setSize(500, 300);
@@ -554,8 +667,67 @@ public class MenuPrincipalApp {
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
-    }
+    }*/
 
+    private static void afficherReservationsIHM() {
+        JFrame frame = new JFrame("Liste des Réservations");
+        frame.setSize(500, 400);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(20, 20, 20, 20));
+
+        if (reservations.isEmpty()) {
+            JLabel labelNoReservations = new JLabel("Aucune réservation disponible.");
+            labelNoReservations.setAlignmentX(Component.CENTER_ALIGNMENT);
+            panel.add(labelNoReservations);
+        } else {
+            for (Reservation reservation : reservations) {
+                JPanel resPanel = new JPanel();
+                resPanel.setLayout(new GridLayout(0, 1));
+
+                JLabel labelSalle = new JLabel("Salle : " + reservation.getSalle());
+                JLabel labelLibelle = new JLabel("Libellé : " + reservation.getLibelle());
+                JLabel labelDescription = new JLabel("Description : " + reservation.getDescription());
+                JLabel labelDate = new JLabel("Date : " + reservation.getDate().toString());
+                JLabel labelHeureDebut = new JLabel("Heure début : " + reservation.getHeureDebut());
+                JLabel labelHeureFin = new JLabel("Heure fin : " + reservation.getHeureFin());
+                JLabel labelNomResa = new JLabel("Réservé par : " + reservation.getNomresa());
+
+                resPanel.add(labelSalle);
+                resPanel.add(labelLibelle);
+                resPanel.add(labelDescription);
+                resPanel.add(labelDate);
+                resPanel.add(labelHeureDebut);
+                resPanel.add(labelHeureFin);
+                resPanel.add(labelNomResa);
+
+                panel.add(resPanel);
+                panel.add(Box.createVerticalStrut(5)); // Espacement entre les réservations
+                panel.add(new JSeparator(SwingConstants.HORIZONTAL));
+            }
+        }
+
+        JButton btnFermer = new JButton("Fermer");
+        JButton btnSupprimer = new JButton("Supprimer");
+        btnFermer.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnSupprimer.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnFermer.addActionListener(e -> frame.dispose());
+        panel.add(btnFermer);
+        panel.add(btnSupprimer);
+
+        JPanel boutonPanel = new JPanel();
+        boutonPanel.add(btnFermer);
+        boutonPanel.add(btnSupprimer);
+        frame.add(panel, BorderLayout.CENTER);
+        frame.add(boutonPanel, BorderLayout.SOUTH);
+
+        frame.add(new JScrollPane(panel)); // Barre de défilement
+
+        frame.setVisible(true);
+    }
 
     /*private static void afficherConsommationIHM() {
         // Fenêtre pour afficher la consommation
@@ -589,10 +761,10 @@ public class MenuPrincipalApp {
         frame.add(buttonPanel, BorderLayout.SOUTH);
 
         frame.setVisible(true);
-    }*/
+    }
 
 
-    /*private static void detecterProblemeIHM() {
+    private static void detecterProblemeIHM() {
         // Fenêtre pour afficher l'état du problème
         JFrame frame = new JFrame("Détection de Problème");
         frame.setSize(500, 250);
@@ -746,5 +918,55 @@ abstract class Capteur {
 class Salle extends Capteur {
     public Salle(String nom) {
         super(nom);
+    }
+}
+
+class Reservation {
+    private String libelle;
+    private String salle;
+    private String description;
+    private Date date;
+    private String heureDebut;
+    private String heureFin;
+    private String nomresa;
+
+    // Constructeur prenant tous les paramètres
+    public Reservation(String libelle, String salle, String description, Date date, String heureDebut, String heureFin, String nomresa) {
+        this.libelle = libelle;
+        this.salle = salle;
+        this.description = description;
+        this.date = date;
+        this.heureDebut = heureDebut;
+        this.heureFin = heureFin;
+        this.nomresa = nomresa;
+    }
+
+    // Getters
+    public String getLibelle() {
+        return libelle;
+    }
+
+    public String getSalle() {
+        return salle;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public Date getDate() {
+        return date;
+    }
+
+    public String getHeureDebut() {
+        return heureDebut;
+    }
+
+    public String getHeureFin() {
+        return heureFin;
+    }
+
+    public String getNomresa() {
+        return nomresa;
     }
 }

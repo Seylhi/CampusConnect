@@ -12,32 +12,56 @@ import java.util.Date;
 @JsonRootName(value = "capteur")
 public class Capteur {
     private String id;
+    private boolean statut;
+    private boolean presence;
+    private boolean detectionProbleme;
 
 
     public Capteur() {
     }
     public final Capteur build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet,"id");
+        setFieldsFromResulset(resultSet,"id_capteur");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
         return buildPreparedStatement(preparedStatement, id);
     }
-    public Capteur( String id) {
+    public Capteur( String id, boolean statut, boolean presence, boolean detectionProbleme) {
         this.id = id;
+        this.statut = statut;
+        this.presence = presence;
+        this.detectionProbleme = detectionProbleme;
     }
 
     public String getId() {
         return id;
     }
+    public boolean getStatut() {return statut;}
+    public boolean getPresence() {return presence;}
+    public boolean getDetectionProbleme() {return detectionProbleme;}
 
 
 
     @JsonProperty("capteur_id")
     public void setId(String id) {
         this.id = id;
+    }
+
+    @JsonProperty("capteur_statut")
+    public void setStatut(boolean statut) {
+        this.statut = statut;
+    }
+
+    @JsonProperty("capteur_presence")
+    public void setPresence(boolean presence) {
+        this.presence = statut;
+    }
+
+    @JsonProperty("capteur_detectionProbleme")
+    public void setDetectionProbleme(boolean detectionProbleme) {
+        this.detectionProbleme = detectionProbleme;
     }
 
     private void setFieldsFromResulset(final ResultSet resultSet, final String ... fieldNames )

@@ -39,7 +39,7 @@ public class CapteurService {
         final Capteurs cps = ConfigLoader.loadConfig(Capteurs.class, capteursToBeInserted);
 
         int birthdate = 0;
-        for(final Capteurs cp : cps.getCapteurs()) {
+        for(final Capteur cp : cps.getCapteurs()) {
             final ObjectMapper objectMapper = new ObjectMapper();
             final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(cp);
             logger.trace("Capteur with its JSON face : {}", jsonifiedGuy);

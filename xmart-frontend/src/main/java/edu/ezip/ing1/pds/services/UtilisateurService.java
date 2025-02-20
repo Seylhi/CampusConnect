@@ -23,7 +23,7 @@ import java.util.UUID;
 public class UtilisateurService {
     private final static String LoggingLabel = "FrontEnd - UtilisateurService";
     private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
-    private final static String utilisateursToBeInserted = "utilisateurs-to-be-inserted.yaml";
+    private final static String utilisateursToBeInserted = "Utilisateurs-to-be-inserted.yaml";
 
     final String insertRequestOrder = "INSERT_UTILISATEUR";
     final String selectRequestOrder = "SELECT_ALL_UTILISATEURS";
@@ -69,7 +69,7 @@ public class UtilisateurService {
 
     public Utilisateurs selectUtilisateurs() throws InterruptedException, IOException {
         int birthdate = 0;
-        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final Deque<ClientRequest> clientRequests = new ArrayDeque<>();
         final ObjectMapper objectMapper = new ObjectMapper();
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
@@ -77,7 +77,10 @@ public class UtilisateurService {
         request.setRequestOrder(selectRequestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+
+        logger.info("🔍 Envoi de la requête SELECT_ALL_UTILISATEURS pour récupérer les utilisateurs.");
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+
         final SelectAllUtilisateursClientRequest clientRequest = new SelectAllUtilisateursClientRequest(
                 networkConfig,
                 birthdate++, request, null, requestBytes);
@@ -86,12 +89,24 @@ public class UtilisateurService {
         if(!clientRequests.isEmpty()) {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
-            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            return (Utilisateurs) joinedClientRequest.getResult();
-        }
-        else {
-            logger.error("No utilisateurs found");
+            logger.info("✅ Requête exécutée, récupération des résultats...");
+
+            if (joinedClientRequest.getResult() != null) {
+                Utilisateurs utilisateurs = (Utilisateurs) joinedClientRequest.getResult();
+                logger.info("🔄 Nombre d'utilisateurs récupérés : {}", utilisateurs.getUtilisateurs().size());
+
+                for (Utilisateur user : utilisateurs.getUtilisateurs()) {
+                    logger.info("👤 Utilisateur : {} {} | Email : {}", user.getPrenom(), user.getNom(), user.getEmail());
+                }
+                return utilisateurs;
+            } else {
+                logger.warn("⚠️ Aucun utilisateur récupéré depuis la base de données !");
+                return null;
+            }
+        } else {
+            logger.error("❌ Erreur : La requête n'a pas été envoyée correctement.");
             return null;
         }
     }
+
 }

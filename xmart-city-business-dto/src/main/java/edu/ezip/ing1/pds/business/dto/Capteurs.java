@@ -6,17 +6,18 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.LinkedHashSet;
 import java.util.Set;
 
+
 public class Capteurs {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("capteurs")
-    private  Set<Capteurs> capteurs = new LinkedHashSet<Capteurs>();
+    private  Set<Capteur> capteurs = new LinkedHashSet<>();
 
-    public Set<Capteurs> getCapteurs() {
+    public Set<Capteur> getCapteurs() {
         return capteurs;
     }
 
-    public void setCapteurs(Set<Capteurs> capteurs) {
+    public void setCapteurs(Set<Capteur> capteurs) {
         this.capteurs = capteurs;
     }
 

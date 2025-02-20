@@ -28,8 +28,8 @@ public class XMartCityService {
     private enum Queries {
         //SELECT_ALL_STUDENTS("SELECT t.name, t.firstname, t.groupname, t.id FROM students t"),
         //INSERT_STUDENT("INSERT into students (name, firstname, groupname) values (?, ?, ?)");
-        SELECT_ALL_UTILISATEURS("SELECT t.nom_utilisateur, t.nom, t.prenom, t.email, t.id_utilisateur FROM utilisateurs t"),
-        INSERT_UTILISATEUR("INSERT INTO utilisateurs (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)");
+        SELECT_ALL_UTILISATEURS("SELECT t.nom_utilisateur, t.nom, t.prenom, t.email, t.id_utilisateur FROM Utilisateur t"),
+        INSERT_UTILISATEUR("INSERT INTO Utilisateur (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)");
         private final String query;
 
         private Queries(final String query) {

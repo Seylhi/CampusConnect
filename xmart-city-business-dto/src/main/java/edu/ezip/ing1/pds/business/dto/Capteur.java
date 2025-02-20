@@ -7,6 +7,7 @@ import java.lang.reflect.Field;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Date;
 
 @JsonRootName(value = "capteur")
 public class Capteur {

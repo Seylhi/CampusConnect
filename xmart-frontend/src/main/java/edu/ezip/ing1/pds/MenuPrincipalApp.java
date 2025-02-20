@@ -1,3 +1,4 @@
+package edu.ezip.ing1.pds;
 import com.toedter.calendar.JDateChooser;
 
 import javax.swing.*;
@@ -10,7 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 
-public class MenuPrincipalApp {
+public class MenuPrincipalApp extends JFrame {
     private static String nomFichier = "accounts.log";
     private static ArrayList<Capteur> appareils = new ArrayList<>();
     private static List<Reservation> reservations = new ArrayList<>();
@@ -27,11 +28,13 @@ public class MenuPrincipalApp {
         appareils.add(new Salle("TD5"));
         appareils.add(new Salle("TD7"));
 
+        SwingUtilities.invokeLater(MenuPrincipalApp::new);
+
         SwingUtilities.invokeLater(MenuPrincipalApp::creerInterface);
     }
 
     private static void creerInterface() {
-        JFrame frame = new JFrame("Gestion des Capteurs");
+        JFrame frame = new JFrame("CampusConnect");
         frame.setSize(300, 200);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         frame.setLocationRelativeTo(null);

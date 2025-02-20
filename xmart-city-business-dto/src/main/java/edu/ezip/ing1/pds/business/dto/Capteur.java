@@ -11,8 +11,6 @@ import java.util.Date;
 
 @JsonRootName(value = "capteur")
 public class Capteur {
-    private  String type ;
-    private  String statut;
     private String id;
 
 
@@ -20,41 +18,21 @@ public class Capteur {
     }
     public final Capteur build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet, "type", "statut","id");
+        setFieldsFromResulset(resultSet,"id");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, type, statut, id);
+        return buildPreparedStatement(preparedStatement, id);
     }
-    public Capteur(String type, String statut, String id) {
-        this.type = type;
-        this.statut = statut;
+    public Capteur( String id) {
         this.id = id;
     }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getStatut() {
-        return statut;
-    }
-
 
     public String getId() {
         return id;
     }
 
-    @JsonProperty("capteur_type")
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    @JsonProperty("capteur_statut")
-    public void setStatut(String statut) {
-        this.statut = statut;
-    }
 
 
     @JsonProperty("capteur_id")
@@ -81,8 +59,6 @@ public class Capteur {
     @Override
     public String toString() {
         return "Student{" +
-                "type='" + type + '\'' +
-                ", statut='" + statut + '\'' +
                 ", id='" + id + '\'' +
                 '}';
     }

@@ -9,7 +9,7 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.UtilisateurService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
+import javax.swing.*;
 import java.io.IOException;
 import java.util.ArrayDeque;
 import java.util.Deque;
@@ -44,5 +44,6 @@ public class MainFrontEnd {
         } else {
             logger.warn("Aucun utilisateur trouvé.");
         }
+        SwingUtilities.invokeLater(MenuPrincipalApp::new);
     }
 }

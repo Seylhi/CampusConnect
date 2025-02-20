@@ -78,7 +78,6 @@ public class UtilisateurService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-        logger.info("🔍 Envoi de la requête SELECT_ALL_UTILISATEURS pour récupérer les utilisateurs.");
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
 
         final SelectAllUtilisateursClientRequest clientRequest = new SelectAllUtilisateursClientRequest(
@@ -89,22 +88,22 @@ public class UtilisateurService {
         if(!clientRequests.isEmpty()) {
             final ClientRequest joinedClientRequest = clientRequests.pop();
             joinedClientRequest.join();
-            logger.info("✅ Requête exécutée, récupération des résultats...");
+
 
             if (joinedClientRequest.getResult() != null) {
                 Utilisateurs utilisateurs = (Utilisateurs) joinedClientRequest.getResult();
-                logger.info("🔄 Nombre d'utilisateurs récupérés : {}", utilisateurs.getUtilisateurs().size());
+
 
                 for (Utilisateur user : utilisateurs.getUtilisateurs()) {
-                    logger.info("👤 Utilisateur : {} {} | Email : {}", user.getPrenom(), user.getNom(), user.getEmail());
+
                 }
                 return utilisateurs;
             } else {
-                logger.warn("⚠️ Aucun utilisateur récupéré depuis la base de données !");
+                logger.warn("Aucun utilisateur récupéré.");
                 return null;
             }
         } else {
-            logger.error("❌ Erreur : La requête n'a pas été envoyée correctement.");
+            logger.error("Erreur requete");
             return null;
         }
     }

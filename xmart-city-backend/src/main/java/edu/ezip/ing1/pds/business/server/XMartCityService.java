@@ -30,7 +30,7 @@ public class XMartCityService {
     private enum Queries {
         //SELECT_ALL_STUDENTS("SELECT t.name, t.firstname, t.groupname, t.id FROM students t"),
         //INSERT_STUDENT("INSERT into students (name, firstname, groupname) values (?, ?, ?)");
-        SELECT_ALL_UTILISATEURS("SELECT t.nom_utilisateur, t.nom, t.prenom, t.email, t.id_utilisateur FROM Utilisateur t"),
+        SELECT_ALL_UTILISATEURS("SELECT * FROM `Utilisateur`"),
         INSERT_UTILISATEUR("INSERT INTO Utilisateur (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)");
         private final String query;
 
@@ -236,12 +236,23 @@ public class XMartCityService {
         Utilisateurs utilisateurs = new Utilisateurs();
         while (res.next()) {
             Utilisateur utilisateur = new Utilisateur();
-            utilisateur.setNomUtilisateur(res.getString(1));
-            utilisateur.setNom(res.getString(2));
-            utilisateur.setPrenom(res.getString(3));
-            utilisateur.setEmail(res.getString(4));
-            utilisateur.setIdUtilisateur(res.getString(5));
+            utilisateur.setIdUtilisateur(res.getString(1));
+            utilisateur.setNomUtilisateur(res.getString(2));
+            utilisateur.setEmail(res.getString(3));
+            utilisateur.setPassword(res.getString(4));
+            utilisateur.setDateCreation(res.getDate(5));
+            utilisateur.setNom(res.getString(6));
+            utilisateur.setPrenom(res.getString(7));
+            utilisateur.setAge(res.getInt(8));
+            utilisateur.setDateDeNaissance(res.getDate(9));
+            utilisateur.setSexe(res.getString(10));
+
+
             utilisateurs.add(utilisateur);
+        }
+
+        if (utilisateurs.getUtilisateurs().isEmpty()) {
+            return new Response(request.getRequestId(), "Aucun patient trouvé");
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateurs));
     }

@@ -12,18 +12,29 @@ public class Utilisateurs {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("utilisateurs")
-    private Set<Utilisateur> utilisateurs = new LinkedHashSet<>();
+    private Set<Utilisateur> utilisateurs;
+
+    public Utilisateurs() {
+        this.utilisateurs = new LinkedHashSet<>();
+    }
 
     public Set<Utilisateur> getUtilisateurs() {
         return utilisateurs;
     }
 
     public void setUtilisateurs(Set<Utilisateur> utilisateurs) {
-        this.utilisateurs = utilisateurs;
+        if (utilisateurs != null) {
+            this.utilisateurs= utilisateurs;
+        } else {
+            this.utilisateurs = new LinkedHashSet<>();
+        }
     }
 
-    public final Utilisateurs add(final Utilisateur utilisateur) {
-        utilisateurs.add(utilisateur);
+
+    public Utilisateurs add(Utilisateur utilisateur) {
+        if (utilisateur != null) {
+            utilisateurs.add(utilisateur);
+        }
         return this;
     }
 

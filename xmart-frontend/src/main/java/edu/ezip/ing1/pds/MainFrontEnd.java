@@ -1,49 +1,70 @@
 package edu.ezip.ing1.pds;
 
-import de.vandermeer.asciitable.AsciiTable;
 import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
-import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.UtilisateurService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import javax.swing.*;
+import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
 
 public class MainFrontEnd {
 
-    private final static String LoggingLabel = "FrontEnd";
-    private final static Logger logger = LoggerFactory.getLogger(LoggingLabel);
     private final static String networkConfigFile = "network.yaml";
-    //private static final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
 
     public static void main(String[] args) throws IOException, InterruptedException {
+
+        // Charger la configuration réseau
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
-        logger.debug("Load Network config file : {}", networkConfig.toString());
 
+        // Créer le service d'utilisateurs
         final UtilisateurService utilisateurService = new UtilisateurService(networkConfig);
-        //utilisateurService.insertUtilisateurs();
         Utilisateurs utilisateurs = utilisateurService.selectUtilisateurs();
-        final AsciiTable asciiTable = new AsciiTable();
-        /*for (final Utilisateur utilisateur : utilisateurs.getUtilisateurs()) {
-            asciiTable.addRule();
-            asciiTable.addRow(utilisateur.getPrenom(), utilisateur.getNom(), utilisateur.getEmail());
-        }
-        asciiTable.addRule();
-        logger.debug("\n{}\n", asciiTable.render());*/
 
-        if (utilisateurs != null && !utilisateurs.getUtilisateurs().isEmpty()) {
-            logger.info("Connexion à la bdd :");
+        // Créer la fenêtre Swing
+        JFrame frame = new JFrame("Liste des Utilisateurs");
+        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setSize(800, 600);
+
+        // Créer les colonnes du tableau
+        String[] columnNames = {"ID", "Nom d'utilisateur", "Email", "Mot de passe", "Date de création",
+                "Nom", "Prénom", "Âge", "Date de naissance", "Sexe"};
+
+        // Créer un modèle de tableau pour y insérer les données
+        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+
+        // Si des utilisateurs sont trouvés, on les ajoute au modèle du tableau
+        if (utilisateurs != null && utilisateurs.getUtilisateurs() != null && !utilisateurs.getUtilisateurs().isEmpty()) {
             for (final Utilisateur utilisateur : utilisateurs.getUtilisateurs()) {
-                System.out.println("Utilisateur : " + utilisateur.getPrenom() + " " + utilisateur.getNom() + " | Email : " + utilisateur.getEmail());
+                Object[] row = {
+                        utilisateur.getIdUtilisateur(),
+                        utilisateur.getNomUtilisateur(),
+                        utilisateur.getEmail(),
+                        utilisateur.getPassword(),
+                        utilisateur.getDateCreation(),
+                        utilisateur.getNom(),
+                        utilisateur.getPrenom(),
+                        utilisateur.getAge(),
+                        utilisateur.getDateDeNaissance(),
+                        utilisateur.getSexe()
+                };
+                tableModel.addRow(row);
             }
         } else {
-            logger.warn("Aucun utilisateur trouvé.");
+            // Ajouter une ligne pour indiquer qu'aucun utilisateur n'a été trouvé
+            tableModel.addRow(new Object[]{"", "", "", "", "", "", "", "", "", "Aucun utilisateur trouvé"});
         }
-        SwingUtilities.invokeLater(MenuPrincipalApp::new);
+
+        // Créer le tableau avec le modèle de données
+        JTable table = new JTable(tableModel);
+
+        // Ajouter le tableau dans un JScrollPane pour pouvoir faire défiler
+        JScrollPane scrollPane = new JScrollPane(table);
+        frame.add(scrollPane);
+
+        // Afficher la fenêtre
+        frame.setVisible(true);
     }
 }

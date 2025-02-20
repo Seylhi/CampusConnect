@@ -58,7 +58,7 @@ public class Capteur {
 
     @Override
     public String toString() {
-        return "Student{" +
+        return "Capteur{" +
                 ", id='" + id + '\'' +
                 '}';
     }

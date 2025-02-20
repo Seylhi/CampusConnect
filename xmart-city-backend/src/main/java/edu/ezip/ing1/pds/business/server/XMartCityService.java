@@ -40,7 +40,7 @@ public class XMartCityService {
     }
 
     private enum Queries1 {
-        SELECT_ALL_CAPTEURS("SELECT t.presence, t.statut, t.id, t.detection_probleme FROM capteur t"),
+        SELECT_ALL_CAPTEURS("SELECT * FROM capteur t"),
         INSERT_CAPTEUR("INSERT into capteurs (presence, statut, id, detection_probleme) values (?, ?, ?, ?)");
         private final String query1;
 

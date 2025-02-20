@@ -40,8 +40,8 @@ public class XMartCityService {
     }
 
     private enum Queries1 {
-        SELECT_ALL_CAPTEURS("SELECT t.type, t.statut, t.id FROM capteur t"),
-        INSERT_CAPTEUR("INSERT into capteurs (type, statut, id) values (?, ?, ?)");
+        SELECT_ALL_CAPTEURS("SELECT t.presence, t.statut, t.id, t.detection_probleme FROM capteur t"),
+        INSERT_CAPTEUR("INSERT into capteurs (presence, statut, id, detection_probleme) values (?, ?, ?, ?)");
         private final String query1;
 
         private Queries1(final String query) {
@@ -177,9 +177,7 @@ public class XMartCityService {
         final Capteur capteur = objectMapper.readValue(request.getRequestBody(), Capteur.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries1.INSERT_CAPTEUR.query1);
-        stmt.setString(1, capteur.getType());
-        stmt.setString(2, capteur.getStatut());
-        stmt.setString(3, capteur.getId());
+        stmt.setString(1, capteur.getId());
         stmt.executeUpdate();
 
         final Statement stmt2 = connection.createStatement();
@@ -255,9 +253,7 @@ public class XMartCityService {
         Capteurs capteurs = new Capteurs();
         while (res.next()) {
             Capteur capteur = new Capteur();
-            capteur.setType(res.getString(1));
-            capteur.setStatut(res.getString(2));
-            capteur.setId(res.getString(3));
+            capteur.setId(res.getString(1));
             capteurs.add(capteur);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteurs));

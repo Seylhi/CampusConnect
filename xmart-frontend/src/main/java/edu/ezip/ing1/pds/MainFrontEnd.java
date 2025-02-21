@@ -7,6 +7,7 @@ import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.UtilisateurService;
 import edu.ezip.ing1.pds.services.CapteurService;
+import edu.ezip.ing1.pds.services.CapteurService;
 
 import javax.swing.*;
 import java.awt.*;

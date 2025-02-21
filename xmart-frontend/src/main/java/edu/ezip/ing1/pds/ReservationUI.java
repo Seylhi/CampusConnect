@@ -74,7 +74,7 @@ public class ReservationUI {
         formPanel.add(new JLabel("Description:"));
         formPanel.add(descriptionField);
         formPanel.add(ajouterButton);
-        formPanel.add(rafraichirButton);
+        //formPanel.add(rafraichirButton);
 
         ajouterButton.addActionListener(new ActionListener() {
             @Override
@@ -109,7 +109,7 @@ public class ReservationUI {
             }
         });
 
-        rafraichirButton.addActionListener(e -> table.repaint());
+        //rafraichirButton.addActionListener(e -> table.repaint());
 
         JFrame frame = new JFrame("Gestion des Réservations");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

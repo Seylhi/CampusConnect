@@ -1,24 +1,29 @@
 package edu.ezip.ing1.pds.services;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.SerializationFeature;
-import edu.ezip.commons.LoggingUtils;
+import java.io.IOException;
+import java.util.ArrayDeque;
+import java.util.Deque;
+import java.util.UUID;
+
 import edu.ezip.ing1.pds.business.dto.Reservation;
 import edu.ezip.ing1.pds.business.dto.Reservations;
-import edu.ezip.ing1.pds.client.commons.ClientRequest;
-import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.commons.Request;
-
 import edu.ezip.ing1.pds.requests.InsertReservationClientRequest;
 import edu.ezip.ing1.pds.requests.SelectAllReservationsClientRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
 
-import java.io.IOException;
-import java.util.ArrayDeque;
-import java.util.Deque;
-import java.util.UUID;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+import edu.ezip.commons.LoggingUtils;
+import edu.ezip.ing1.pds.business.dto.Utilisateur;
+import edu.ezip.ing1.pds.business.dto.Utilisateurs;
+import edu.ezip.ing1.pds.client.commons.ClientRequest;
+import edu.ezip.ing1.pds.client.commons.NetworkConfig;
+import edu.ezip.ing1.pds.commons.Request;
+import edu.ezip.ing1.pds.requests.InsertUtilisateursClientRequest;
+import edu.ezip.ing1.pds.requests.SelectAllUtilisateursClientRequest;
 
 public class ReservationService {
 
@@ -27,9 +32,7 @@ public class ReservationService {
 
     final String insertRequestOrder = "INSERT_RESERVATION";
     final String selectRequestOrder = "SELECT_ALL_RESERVATIONS";
-    final String updateRequestOrder = "UPDATE_RESERVATION";
     final String deleteRequestOrder = "DELETE_RESERVATION";
-    final String selectOneRequestOrder = "SELECT_ONE_RESERVATION";
 
     private final NetworkConfig networkConfig;
 
@@ -37,117 +40,81 @@ public class ReservationService {
         this.networkConfig = networkConfig;
     }
 
-    public void insertReservation(Reservation reservation)throws InterruptedException, IOException {
-        insertDeleteUpdateReservation(reservation, insertRequestOrder);
+    /**
+     * Insère un utilisateur dans la base de données.
+     */
+    public void insertReservation(Reservation reservation) throws InterruptedException, IOException {
+        processReservation(reservation, insertRequestOrder);
     }
 
-    public void updateReservation(Reservation reservation)throws InterruptedException, IOException {
-        insertDeleteUpdateReservation(reservation, updateRequestOrder);
-    }
-
-    public void deleteReservation(Reservation reservation)throws InterruptedException, IOException {
-        insertDeleteUpdateReservation(reservation, deleteRequestOrder);
-    }
-
-    public void insertDeleteUpdateReservation(Reservation reservation, String requestOrder) throws InterruptedException, IOException {
-        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
-
-        int birthdate = 0;
+    /**
+     * Fonction générique pour traiter un utilisateur en fonction d'une requête spécifique.
+     */
+    private void processReservation(Reservation reservation, String requestOrder) throws InterruptedException, IOException {
+        final Deque<ClientRequest> reservationRequests = new ArrayDeque<>();
 
         final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reservation);
-        logger.trace("Reservation with its JSON face : {}", jsonifiedGuy);
+        final String jsonifiedReservation = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reservation);
+        logger.trace("Reservation en JSON : {}", jsonifiedReservation);
+
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
         request.setRequestOrder(requestOrder);
-        request.setRequestContent(jsonifiedGuy);
+        request.setRequestContent(jsonifiedReservation);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-        final InsertReservationClientRequest clientRequest = new InsertReservationClientRequest(
-                networkConfig,
-                birthdate++, request, reservation, requestBytes);
-        clientRequests.push(clientRequest);
+        final InsertReservationClientRequest reservationRequest = new InsertReservationClientRequest(
+                networkConfig, 0, request, reservation, requestBytes);
+        reservationRequests.push(reservationRequest);
 
-
-        while (!clientRequests.isEmpty()) {
-            final ClientRequest clientRequest2 = clientRequests.pop();
-            clientRequest2.join();
-            final Reservation resa = (Reservation) clientRequest2.getInfo();
-            logger.debug("Thread {} complete : {} {} {} {} {} {} {}--> {}",
-                    clientRequest2.getThreadName(),
-                    reservation.getId(), reservation.getName(), reservation.getDate(), reservation.getHeuredeb(), reservation.getHeurefin(), reservation.getType(), reservation.getDescription(),
-                    clientRequest2.getResult());
+        while (!reservationRequests.isEmpty()) {
+            final ClientRequest processedRequest = reservationRequests.pop();
+            processedRequest.join();
+            final Reservation processedReservation = (Reservation) processedRequest.getInfo();
+            logger.debug("Thread {} terminé : {} {} --> {}",
+                    processedRequest.getThreadName(),
+                    processedReservation.getId(), processedReservation.getName(), processedReservation.getDate(),processedReservation.getHeuredeb(),processedReservation.getHeurefin(),processedReservation.getType(),processedReservation.getDescription(),
+                    processedRequest.getResult());
         }
     }
 
-    public Reservation selectOneReservation(Reservation reservation) throws InterruptedException, IOException{
-
-        int birthdate = 0;
-        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
-        final ObjectMapper objectMapper = new ObjectMapper();
-        final String jsonifiedGuy = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(reservation);
-        final String requestId = UUID.randomUUID().toString();
-        final Request request = new Request();
-        request.setRequestId(requestId);
-        request.setRequestOrder(selectOneRequestOrder);
-        request.setRequestContent(jsonifiedGuy);
-        objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
-        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
-        final SelectAllReservationsClientRequest clientRequest = new SelectAllReservationsClientRequest(
-                networkConfig,
-                birthdate++, request, null, requestBytes);
-        clientRequests.push(clientRequest);
-
-        if(!clientRequests.isEmpty()) {
-            final ClientRequest joinedClientRequest = clientRequests.pop();
-            joinedClientRequest.join();
-            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName());
-            Reservations reservations = (Reservations) joinedClientRequest.getResult();
-            Reservation resaSelected = null;
-            int k=1;
-            for (Reservation e : reservations.getReservations()) {
-                if(k==1){
-                    resaSelected = e;
-                }
-                k=2;
-            }
-            return resaSelected;
-        }
-        else {
-            logger.error("Aucune réservation n'existe");
-            return null;
-        }
-    }
-
+    /**
+     * Récupère la liste des utilisateurs de la base de données.
+     */
     public Reservations selectReservations() throws InterruptedException, IOException {
-        int birthdate = 0;
-        final Deque<ClientRequest> clientRequests = new ArrayDeque<ClientRequest>();
+        final Deque<ClientRequest> reservationRequests = new ArrayDeque<>();
         final ObjectMapper objectMapper = new ObjectMapper();
+
         final String requestId = UUID.randomUUID().toString();
         final Request request = new Request();
         request.setRequestId(requestId);
         request.setRequestOrder(selectRequestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
-        final byte []  requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
+        final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
         LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
-        final SelectAllReservationsClientRequest clientRequest = new SelectAllReservationsClientRequest(
-                networkConfig,
-                birthdate++, request, null, requestBytes);
-        clientRequests.push(clientRequest);
 
-        if(!clientRequests.isEmpty()) {
-            final ClientRequest joinedClientRequest = clientRequests.pop();
-            joinedClientRequest.join();
-            logger.debug("Thread {} complete.", joinedClientRequest.getThreadName()); //Une fenêtre pour afficher les réservations
-            return (Reservations) joinedClientRequest.getResult();
-        }
-        else {
-            logger.error("No students found");
+        final SelectAllReservationsClientRequest reservationRequest = new SelectAllReservationsClientRequest(
+                networkConfig, 0, request, null, requestBytes);
+        reservationRequests.push(reservationRequest);
+
+        if (!reservationRequests.isEmpty()) {
+            final ClientRequest joinedReservationRequest = reservationRequests.pop();
+            joinedReservationRequest.join();
+            logger.debug("Thread {} terminé.", joinedReservationRequest.getThreadName());
+
+            Reservations reservations = (Reservations) joinedReservationRequest.getResult();
+            if (reservations != null) {
+                logger.info("{} reservations récupérés.", reservations.getReservations().size());
+                return reservations;
+            } else {
+                logger.warn("Aucune reservation trouvée.");
+                return null;
+            }
+        } else {
+            logger.error("Erreur : Aucune reservation récupérée.");
             return null;
         }
     }
-
 }

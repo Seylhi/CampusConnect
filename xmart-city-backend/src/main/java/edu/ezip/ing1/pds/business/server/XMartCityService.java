@@ -30,9 +30,10 @@ public class XMartCityService {
     private enum Queries {
         //SELECT_ALL_STUDENTS("SELECT t.name, t.firstname, t.groupname, t.id FROM students t"),
         //INSERT_STUDENT("INSERT into students (name, firstname, groupname) values (?, ?, ?)");
-        SELECT_ALL_UTILISATEURS("SELECT * FROM `Utilisateur`"),
+        SELECT_ALL_UTILISATEURS("SELECT * FROM Utilisateur"),
         INSERT_UTILISATEUR("INSERT INTO Utilisateur (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)"),
-        SELECT_ALL_CAPTEURS("SELECT * FROM Capteurs ");
+        SELECT_ALL_CAPTEURS("SELECT * FROM Capteurs "),
+        SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations");
         private final String query;
 
         private Queries(final String query) {
@@ -48,7 +49,7 @@ public class XMartCityService {
         private Queries1(final String query) {
             this.query1 = query;
         }
-    }*/
+    }
 
     private enum Queries2 {
         SELECT_ALL_RESERVATIONS("SELECT t.id, t.name, t.date, t.heuredeb, t.heurefin, t.type, t.description FROM reservation t"),
@@ -58,7 +59,7 @@ public class XMartCityService {
         private Queries2(final String query) {
             this.query2 = query;
         }
-    }
+    }*/
 
     public static XMartCityService inst = null;
     public static final XMartCityService getInstance()  {
@@ -91,6 +92,12 @@ public class XMartCityService {
            /* case INSERT_CAPTEUR:
                 response = insertCapteur(request, connection);
                 break;*/
+            case SELECT_ALL_RESERVATIONS:
+                response = selectAllReservations(request, connection);
+                break;
+            /*case INSERT_RESERVATION:
+                response = insertReservation(request, connection);
+                break;*/
             default:
                 break;
 
@@ -118,7 +125,7 @@ public class XMartCityService {
         }
 
         return response;
-    }*/
+    }
 
     public final Response dispatchDeux(final Request request, final Connection connection)
             throws InvocationTargetException, IllegalAccessException, SQLException, IOException {
@@ -201,11 +208,11 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteur));
     }*/
 
-    private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
+    /*private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries2.INSERT_RESERVATION.query2);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_RESERVATION.query);
         stmt.setString(1, reservation.getId());
         stmt.setString(2, reservation.getName());
         stmt.setString(3, String.valueOf(reservation.getDate()));
@@ -222,7 +229,7 @@ public class XMartCityService {
         reservation.setId(res.getString(1));
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(reservation));
-    }
+    }*/
 
 
     /*private Response SelectAllUsers(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
@@ -288,7 +295,7 @@ public class XMartCityService {
     private Response selectAllReservations(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
-        final ResultSet res = stmt.executeQuery(Queries2.SELECT_ALL_RESERVATIONS.query2);
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_RESERVATIONS.query);
         Reservations reservations = new Reservations();
         while (res.next()) {
             Reservation reservation = new Reservation();

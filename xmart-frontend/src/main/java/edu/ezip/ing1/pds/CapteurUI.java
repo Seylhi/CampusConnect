@@ -42,7 +42,7 @@ public class CapteurUI {
         JCheckBox presenceCheckBox = new JCheckBox("Présent");
         JCheckBox problemeCheckBox = new JCheckBox("Problème détecté");
         JButton ajouterButton = new JButton("Ajouter");
-        JButton rafraichirButton = new JButton("Rafraîchir la liste");
+        //JButton rafraichirButton = new JButton("Rafraîchir la liste");
 
         JPanel formPanel = new JPanel();
         formPanel.add(new JLabel("ID Capteur:"));
@@ -51,7 +51,7 @@ public class CapteurUI {
         formPanel.add(presenceCheckBox);
         formPanel.add(problemeCheckBox);
         formPanel.add(ajouterButton);
-        formPanel.add(rafraichirButton);
+        //formPanel.add(rafraichirButton);
 
         ajouterButton.addActionListener(new ActionListener() {
             @Override
@@ -79,7 +79,7 @@ public class CapteurUI {
             }
         });
 
-        rafraichirButton.addActionListener(e -> table.repaint());
+        //rafraichirButton.addActionListener(e -> table.repaint());
 
         JFrame frame = new JFrame("Gestion des Capteurs");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);

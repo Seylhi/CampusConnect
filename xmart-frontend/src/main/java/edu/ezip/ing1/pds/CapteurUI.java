@@ -82,7 +82,7 @@ public class CapteurUI {
         //rafraichirButton.addActionListener(e -> table.repaint());
 
         JFrame frame = new JFrame("Gestion des Capteurs");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());

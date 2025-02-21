@@ -1,13 +1,13 @@
 package edu.ezip.ing1.pds;
 
-import edu.ezip.ing1.pds.business.dto.Utilisateur;
+import edu.ezip.ing1.pds.business.dto.Reservations;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
 import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.UtilisateurService;
 import edu.ezip.ing1.pds.services.CapteurService;
-import edu.ezip.ing1.pds.services.CapteurService;
+import edu.ezip.ing1.pds.services.ReservationService;
 
 import javax.swing.*;
 import java.awt.*;
@@ -29,6 +29,8 @@ public class MainFrontEnd {
         Capteurs capteurs = capteurService.selectCapteurs();
         final UtilisateurService utilisateurService = new UtilisateurService(networkConfig);
         Utilisateurs utilisateurs = utilisateurService.selectUtilisateurs();
+        final ReservationService reservationService = new ReservationService(networkConfig);
+        Reservations reservations = reservationService.selectReservations();
 
         // Création de la fenêtre principale
         JFrame frame = new JFrame("Menu Principal");
@@ -43,6 +45,7 @@ public class MainFrontEnd {
         // Bouton pour ouvrir l'interface des capteurs
         JButton capteurButton = new JButton("Gérer les Capteurs");
         JButton utilisateurButton = new JButton("Utilisateurs");
+        JButton reservationButton = new JButton("Reservations");
 
         // ActionListener pour ouvrir la fenêtre CapteurUI
         capteurButton.addActionListener(new ActionListener() {
@@ -55,6 +58,13 @@ public class MainFrontEnd {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new UtilisateurUI(utilisateurs, utilisateurService);
+            }
+        });
+
+        reservationButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new ReservationUI(reservations, reservationService);
             }
         });
 

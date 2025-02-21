@@ -27,6 +27,8 @@ public class MainFrontEnd {
         // Créer le service des capteurs
         final CapteurService capteurService = new CapteurService(networkConfig);
         Capteurs capteurs = capteurService.selectCapteurs();
+        final UtilisateurService utilisateurService = new UtilisateurService(networkConfig);
+        Utilisateurs utilisateurs = utilisateurService.selectUtilisateurs();
 
         // Création de la fenêtre principale
         JFrame frame = new JFrame("Menu Principal");
@@ -40,12 +42,19 @@ public class MainFrontEnd {
 
         // Bouton pour ouvrir l'interface des capteurs
         JButton capteurButton = new JButton("Gérer les Capteurs");
+        JButton utilisateurButton = new JButton("Utilisateurs");
 
         // ActionListener pour ouvrir la fenêtre CapteurUI
         capteurButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 new CapteurUI(capteurs, capteurService);
+            }
+        });
+        utilisateurButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new UtilisateurUI(utilisateurs, utilisateurService);
             }
         });
 

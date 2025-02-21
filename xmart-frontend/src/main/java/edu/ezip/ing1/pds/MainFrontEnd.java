@@ -2,11 +2,16 @@ package edu.ezip.ing1.pds;
 
 import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
+import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.client.commons.ConfigLoader;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.UtilisateurService;
+import edu.ezip.ing1.pds.services.CapteurService;
 
 import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 
@@ -16,55 +21,40 @@ public class MainFrontEnd {
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        // Charger la configuration réseau
         final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
 
-        // Créer le service d'utilisateurs
-        final UtilisateurService utilisateurService = new UtilisateurService(networkConfig);
-        Utilisateurs utilisateurs = utilisateurService.selectUtilisateurs();
+        // Créer le service des capteurs
+        final CapteurService capteurService = new CapteurService(networkConfig);
+        Capteurs capteurs = capteurService.selectCapteurs();
 
-        // Créer la fenêtre Swing
-        JFrame frame = new JFrame("Liste des Utilisateurs");
+        // Création de la fenêtre principale
+        JFrame frame = new JFrame("Menu Principal");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(400, 300);
+        frame.setLocationRelativeTo(null);
 
-        // Créer les colonnes du tableau
-        String[] columnNames = {"ID", "Nom d'utilisateur", "Email", "Mot de passe", "Date de création",
-                "Nom", "Prénom", "Âge", "Date de naissance", "Sexe"};
+        // Création d'un panel avec un layout vertical
+        JPanel panel = new JPanel();
+        panel.setLayout(new GridLayout(2, 1, 10, 10));
 
-        // Créer un modèle de tableau pour y insérer les données
-        DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        // Bouton pour ouvrir l'interface des capteurs
+        JButton capteurButton = new JButton("Gérer les Capteurs");
 
-        // Si des utilisateurs sont trouvés, on les ajoute au modèle du tableau
-        if (utilisateurs != null && utilisateurs.getUtilisateurs() != null && !utilisateurs.getUtilisateurs().isEmpty()) {
-            for (final Utilisateur utilisateur : utilisateurs.getUtilisateurs()) {
-                Object[] row = {
-                        utilisateur.getIdUtilisateur(),
-                        utilisateur.getNomUtilisateur(),
-                        utilisateur.getEmail(),
-                        utilisateur.getPassword(),
-                        utilisateur.getDateCreation(),
-                        utilisateur.getNom(),
-                        utilisateur.getPrenom(),
-                        utilisateur.getAge(),
-                        utilisateur.getDateDeNaissance(),
-                        utilisateur.getSexe()
-                };
-                tableModel.addRow(row);
+        // ActionListener pour ouvrir la fenêtre CapteurUI
+        capteurButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new CapteurUI(capteurs, capteurService);
             }
-        } else {
-            // Ajouter une ligne pour indiquer qu'aucun utilisateur n'a été trouvé
-            tableModel.addRow(new Object[]{"", "", "", "", "", "", "", "", "", "Aucun utilisateur trouvé"});
-        }
+        });
 
-        // Créer le tableau avec le modèle de données
-        JTable table = new JTable(tableModel);
+        // Ajouter le bouton au panel
+        panel.add(capteurButton);
 
-        // Ajouter le tableau dans un JScrollPane pour pouvoir faire défiler
-        JScrollPane scrollPane = new JScrollPane(table);
-        frame.add(scrollPane);
+        // Ajouter le panel à la fenêtre principale
+        frame.add(panel);
 
-        // Afficher la fenêtre
+        // Afficher la fenêtre principale
         frame.setVisible(true);
     }
 }

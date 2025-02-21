@@ -57,7 +57,8 @@ public class MainFrontEnd {
         utilisateurButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                new UtilisateurUI(utilisateurs, utilisateurService);
+                UtilisateurUI utilisateurUI = new UtilisateurUI();
+                utilisateurUI.afficherUtilisateurs(utilisateurs);
             }
         });
 
@@ -70,6 +71,8 @@ public class MainFrontEnd {
 
         // Ajouter le bouton au panel
         panel.add(capteurButton);
+        panel.add(reservationButton);
+        panel.add(utilisateurButton);
 
         // Ajouter le panel à la fenêtre principale
         frame.add(panel);

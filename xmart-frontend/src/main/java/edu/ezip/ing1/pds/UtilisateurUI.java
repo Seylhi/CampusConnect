@@ -1,4 +1,4 @@
-package edu.ezip.ing1.pds;
+/*package edu.ezip.ing1.pds;
 
 import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
@@ -118,4 +118,4 @@ public class UtilisateurUI {
         frame.add(scrollPane, BorderLayout.CENTER);
         frame.setVisible(true);
     }
-}
+}*/

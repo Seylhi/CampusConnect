@@ -102,14 +102,14 @@ public class UtilisateurService {
 
             Utilisateurs utilisateurs = (Utilisateurs) joinedUtilisateurRequest.getResult();
             if (utilisateurs != null) {
-                logger.info("✅ {} utilisateurs récupérés.", utilisateurs.getUtilisateurs().size());
+                logger.info("{} utilisateurs récupérés.", utilisateurs.getUtilisateurs().size());
                 return utilisateurs;
             } else {
-                logger.warn("⚠️ Aucun utilisateur trouvé.");
+                logger.warn("Aucun utilisateur trouvé.");
                 return null;
             }
         } else {
-            logger.error("❌ Erreur : Aucun utilisateur récupéré.");
+            logger.error("Erreur : Aucun utilisateur récupéré.");
             return null;
         }
     }

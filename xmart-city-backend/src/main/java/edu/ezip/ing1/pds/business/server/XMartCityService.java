@@ -31,7 +31,8 @@ public class XMartCityService {
         //SELECT_ALL_STUDENTS("SELECT t.name, t.firstname, t.groupname, t.id FROM students t"),
         //INSERT_STUDENT("INSERT into students (name, firstname, groupname) values (?, ?, ?)");
         SELECT_ALL_UTILISATEURS("SELECT * FROM `Utilisateur`"),
-        INSERT_UTILISATEUR("INSERT INTO Utilisateur (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)");
+        INSERT_UTILISATEUR("INSERT INTO Utilisateur (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)"),
+        SELECT_ALL_CAPTEURS("SELECT * FROM Capteurs ");
         private final String query;
 
         private Queries(final String query) {
@@ -39,15 +40,15 @@ public class XMartCityService {
         }
     }
 
-    private enum Queries1 {
-        SELECT_ALL_CAPTEURS("SELECT t.presence, t.statut, t.id, t.detection_probleme FROM capteur t"),
-        INSERT_CAPTEUR("INSERT into capteurs (presence, statut, id, detection_probleme) values (?, ?, ?, ?)");
+   /* private enum Queries1 {
+        SELECT_ALL_CAPTEURS("SELECT * FROM Capteur "),
+        INSERT_CAPTEUR("INSERT into Capteurs (id_capteur, statut, presence, detection_probleme) values (?, ?, ?, ?)");
         private final String query1;
 
         private Queries1(final String query) {
             this.query1 = query;
         }
-    }
+    }*/
 
     private enum Queries2 {
         SELECT_ALL_RESERVATIONS("SELECT t.id, t.name, t.date, t.heuredeb, t.heurefin, t.type, t.description FROM reservation t"),
@@ -84,18 +85,26 @@ public class XMartCityService {
             case INSERT_UTILISATEUR:
                 response = insertUtilisateur(request, connection);
                 break;
+            case SELECT_ALL_CAPTEURS:
+                response = selectAllCapteurs(request, connection);
+                break;
+           /* case INSERT_CAPTEUR:
+                response = insertCapteur(request, connection);
+                break;*/
             default:
                 break;
+
+
         }
 
         return response;
     }
 
-    public final Response dispatchUn(final Request request, final Connection connection)
+    /*public final Response dispatchUn(final Request request, final Connection connection)
             throws InvocationTargetException, IllegalAccessException, SQLException, IOException {
         Response response = null;
 
-        final Queries1 queryEnum = Enum.valueOf(Queries1.class, request.getRequestOrder());
+        final Queries queryEnum = Enum.valueOf(Queries.class, request.getRequestOrder());
         switch(queryEnum) {
 
             case SELECT_ALL_CAPTEURS:
@@ -109,7 +118,7 @@ public class XMartCityService {
         }
 
         return response;
-    }
+    }*/
 
     public final Response dispatchDeux(final Request request, final Connection connection)
             throws InvocationTargetException, IllegalAccessException, SQLException, IOException {
@@ -119,10 +128,10 @@ public class XMartCityService {
         switch(queryEnum) {
 
             case SELECT_ALL_RESERVATIONS:
-                response = selectAllCapteurs(request, connection);
+                response = selectAllReservations(request, connection);
                 break;
             case INSERT_RESERVATION:
-                response = insertCapteur(request, connection);
+                response = insertReservation(request, connection);
                 break;
             default:
                 break;
@@ -172,12 +181,15 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateur));
     }
 
-    private Response insertCapteur(final Request request, final Connection connection) throws SQLException, IOException {
+    /*private Response insertCapteur(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Capteur capteur = objectMapper.readValue(request.getRequestBody(), Capteur.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries1.INSERT_CAPTEUR.query1);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_CAPTEUR.query1);
         stmt.setString(1, capteur.getId());
+        stmt.setBoolean(2, capteur.getPresence());
+        stmt.setBoolean(3, capteur.getStatut());
+        stmt.setBoolean(4, capteur.getDetectionProbleme());
         stmt.executeUpdate();
 
         final Statement stmt2 = connection.createStatement();
@@ -187,7 +199,7 @@ public class XMartCityService {
         capteur.setId(res.getString(1));
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteur));
-    }
+    }*/
 
     private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
@@ -260,11 +272,14 @@ public class XMartCityService {
     private Response selectAllCapteurs(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Statement stmt = connection.createStatement();
-        final ResultSet res = stmt.executeQuery(Queries1.SELECT_ALL_CAPTEURS.query1);
+        final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_CAPTEURS.query);
         Capteurs capteurs = new Capteurs();
         while (res.next()) {
             Capteur capteur = new Capteur();
             capteur.setId(res.getString(1));
+            capteur.setStatut(res.getBoolean(2));
+            capteur.setPresence(res.getBoolean(3));
+            capteur.setDetectionProbleme(res.getBoolean(4));
             capteurs.add(capteur);
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteurs));

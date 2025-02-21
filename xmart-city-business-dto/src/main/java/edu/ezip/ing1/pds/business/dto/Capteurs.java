@@ -11,14 +11,22 @@ public class Capteurs {
 
     @JsonInclude(JsonInclude.Include.NON_NULL)
     @JsonProperty("capteurs")
-    private  Set<Capteur> capteurs = new LinkedHashSet<>();
+    private Set<Capteur> capteurs;
+
+    public Capteurs() {
+        this.capteurs = new LinkedHashSet<>();
+    }
 
     public Set<Capteur> getCapteurs() {
         return capteurs;
     }
 
     public void setCapteurs(Set<Capteur> capteurs) {
-        this.capteurs = capteurs;
+        if (capteurs != null) {
+            this.capteurs= capteurs;
+        } else {
+            this.capteurs = new LinkedHashSet<>();
+        };
     }
 
     public final Capteurs add (final Capteur capteur) {

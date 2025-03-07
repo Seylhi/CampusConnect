@@ -17,7 +17,7 @@ public class CapteurUI {
         this.capteurService = capteurService;
         SwingUtilities.invokeLater(() -> createAndShowGUI(capteurs));
     }
-
+ 
     private void createAndShowGUI(Capteurs capteurs) {
         JTextField idField = new JTextField(5);
         JButton rechercheButton = new JButton("Rechercher");

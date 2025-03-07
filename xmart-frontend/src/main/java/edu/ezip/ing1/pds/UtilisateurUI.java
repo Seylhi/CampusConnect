@@ -113,7 +113,7 @@ public class UtilisateurUI {
     // Méthode pour afficher un formulaire de création d'utilisateur
     private void afficherFormulaireCreation() {
         JFrame frame = new JFrame("Créer un Utilisateur");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(400, 300);
         frame.setLocationRelativeTo(null);
 

@@ -19,7 +19,7 @@ public class ReservationUI {
         this.reservationService = reservationService;
         SwingUtilities.invokeLater(() -> createAndShowGUI(reservations));
     }
-
+    // informations que l'on va sortir dans notre table
     private void createAndShowGUI(Reservations reservations) {
         DefaultTableModel tableModel = new DefaultTableModel();
         tableModel.addColumn("ID Réservation");
@@ -30,6 +30,7 @@ public class ReservationUI {
         tableModel.addColumn("Type");
         tableModel.addColumn("Description");
 
+        // vérifier que les informations de "réservation", ne sont pas nulles pour ajouter les informations
         if (reservations != null && reservations.getReservations() != null && !reservations.getReservations().isEmpty()) {
             for (Reservation reservation : reservations.getReservations()) {
                 tableModel.addRow(new Object[]{
@@ -58,6 +59,7 @@ public class ReservationUI {
         JButton ajouterButton = new JButton("Ajouter");
         JButton rafraichirButton = new JButton("Rafraîchir la liste");
 
+        // potentiellement pour ajouter des réservations à l'avenir
         JPanel formPanel = new JPanel();
         formPanel.add(new JLabel("ID Réservation:"));
         formPanel.add(idField);
@@ -112,7 +114,7 @@ public class ReservationUI {
         //rafraichirButton.addActionListener(e -> table.repaint());
 
         JFrame frame = new JFrame("Gestion des Réservations");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());

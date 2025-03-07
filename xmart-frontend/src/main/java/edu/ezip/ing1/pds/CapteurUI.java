@@ -5,11 +5,9 @@ import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.services.CapteurService;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.io.IOException;
 
 public class CapteurUI {
 
@@ -21,73 +19,62 @@ public class CapteurUI {
     }
 
     private void createAndShowGUI(Capteurs capteurs) {
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("ID Capteur");
-        tableModel.addColumn("Statut");
-        tableModel.addColumn("Présence");
-        tableModel.addColumn("Problème Détecté");
-
-        if (capteurs != null && capteurs.getCapteurs() != null && !capteurs.getCapteurs().isEmpty()) {
-            for (Capteur capteur : capteurs.getCapteurs()) {
-                tableModel.addRow(new Object[]{capteur.getId(), capteur.getStatut() ? "Actif" : "Inactif", capteur.getPresence() ? "Oui" : "Non", capteur.getDetectionProbleme() ? "Oui" : "Non"});
-            }
-        }
-
-        JTable table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-        table.setFillsViewportHeight(true);
-
         JTextField idField = new JTextField(5);
-        JCheckBox statutCheckBox = new JCheckBox("Actif");
-        JCheckBox presenceCheckBox = new JCheckBox("Présent");
-        JCheckBox problemeCheckBox = new JCheckBox("Problème détecté");
-        JButton ajouterButton = new JButton("Ajouter");
-        //JButton rafraichirButton = new JButton("Rafraîchir la liste");
+        JButton rechercheButton = new JButton("Rechercher");
+        JLabel statutLabel = new JLabel("Statut : ");
+        JLabel presenceLabel = new JLabel("Présence : ");
+        JLabel problemeLabel = new JLabel("Problème détecté : ");
 
-        JPanel formPanel = new JPanel();
-        formPanel.add(new JLabel("ID Capteur:"));
-        formPanel.add(idField);
-        formPanel.add(statutCheckBox);
-        formPanel.add(presenceCheckBox);
-        formPanel.add(problemeCheckBox);
-        formPanel.add(ajouterButton);
-        //formPanel.add(rafraichirButton);
+        // Formulaire pour la recherche par ID
+        JPanel searchPanel = new JPanel();
+        searchPanel.add(new JLabel("ID Capteur:"));
+        searchPanel.add(idField);
+        searchPanel.add(rechercheButton);
 
-        ajouterButton.addActionListener(new ActionListener() {
+        // Panel pour afficher les informations du capteur
+        JPanel resultPanel = new JPanel();
+        resultPanel.setLayout(new BoxLayout(resultPanel, BoxLayout.Y_AXIS));
+        resultPanel.add(statutLabel);
+        resultPanel.add(presenceLabel);
+        resultPanel.add(problemeLabel);
+
+        // Recherche du capteur par ID
+        rechercheButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 String id = idField.getText().trim();
-                boolean statut = statutCheckBox.isSelected();
-                boolean presence = presenceCheckBox.isSelected();
-                boolean probleme = problemeCheckBox.isSelected();
-
                 if (!id.isEmpty()) {
-                    try {
-                        Capteur capteur = new Capteur(id, statut, presence, probleme);
-                        capteurService.insertCapteur(capteur);
-                        tableModel.addRow(new Object[]{id, statut ? "Actif" : "Inactif", presence ? "Oui" : "Non", probleme ? "Oui" : "Non"});
-                        idField.setText("");
-                        statutCheckBox.setSelected(false);
-                        presenceCheckBox.setSelected(false);
-                        problemeCheckBox.setSelected(false);
-                    } catch (IOException | InterruptedException ex) {
-                        JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout du capteur.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    // Recherche du capteur par ID
+                    Capteur capteur = null;
+                    for (Capteur c : capteurs.getCapteurs()) {
+                        if (c.getId().equals(id)) {
+                            capteur = c;
+                            break;
+                        }
+                    }
+
+                    if (capteur != null) {
+                        // Affichage des informations du capteur trouvé
+                        statutLabel.setText("Statut : " + (capteur.getStatut() ? "Actif" : "Inactif"));
+                        presenceLabel.setText("Présence : " + (capteur.getPresence() ? "Oui" : "Non"));
+                        problemeLabel.setText("Problème détecté : " + (capteur.getDetectionProbleme() ? "Oui" : "Non"));
+                    } else {
+                        JOptionPane.showMessageDialog(null, "Capteur non trouvé.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez entrer un ID de capteur.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
 
-        //rafraichirButton.addActionListener(e -> table.repaint());
-
+        // JFrame pour l'interface
         JFrame frame = new JFrame("Gestion des Capteurs");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
-        frame.add(formPanel, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(searchPanel, BorderLayout.NORTH);
+        frame.add(resultPanel, BorderLayout.CENTER);
         frame.setVisible(true);
     }
 }

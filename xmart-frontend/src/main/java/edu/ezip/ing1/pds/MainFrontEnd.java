@@ -13,7 +13,6 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import javax.swing.table.DefaultTableModel;
 import java.io.IOException;
 
 public class MainFrontEnd {
@@ -43,11 +42,18 @@ public class MainFrontEnd {
         panel.setLayout(new GridLayout(2, 1, 10, 10));
 
         // Bouton pour ouvrir l'interface des capteurs
-        JButton capteurButton = new JButton("Gérer les Capteurs");
+        JButton capteurSimuButton = new JButton("Simulation capteurs");
+        JButton capteurButton = new JButton("Capteurs");
         JButton utilisateurButton = new JButton("Utilisateurs");
         JButton reservationButton = new JButton("Reservations");
 
         // ActionListener pour ouvrir la fenêtre CapteurUI
+        capteurSimuButton.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                new SimuCapteurUI(capteurs, capteurService);
+            }
+        });
         capteurButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -70,9 +76,10 @@ public class MainFrontEnd {
         });
 
         // Ajouter le bouton au panel
-        panel.add(capteurButton);
+        panel.add(capteurSimuButton);
         panel.add(reservationButton);
         panel.add(utilisateurButton);
+        panel.add(capteurButton);
 
         // Ajouter le panel à la fenêtre principale
         frame.add(panel);

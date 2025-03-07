@@ -5,7 +5,6 @@ import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.services.CapteurService;
 
 import javax.swing.*;
-import javax.swing.table.DefaultTableModel;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,33 +16,18 @@ public class SimuCapteurUI {
 
     public SimuCapteurUI(Capteurs capteurs, CapteurService capteurService) {
         this.capteurService = capteurService;
-        SwingUtilities.invokeLater(() -> createAndShowGUI(capteurs));
+        SwingUtilities.invokeLater(this::createAndShowGUI);
     }
 
-    private void createAndShowGUI(Capteurs capteurs) {
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("ID Capteur");
-        tableModel.addColumn("Statut");
-        tableModel.addColumn("Présence");
-        tableModel.addColumn("Problème Détecté");
-
-        if (capteurs != null && capteurs.getCapteurs() != null && !capteurs.getCapteurs().isEmpty()) {
-            for (Capteur capteur : capteurs.getCapteurs()) {
-                tableModel.addRow(new Object[]{capteur.getId(), capteur.getStatut() ? "Actif" : "Inactif", capteur.getPresence() ? "Oui" : "Non", capteur.getDetectionProbleme() ? "Oui" : "Non"});
-            }
-        }
-
-        JTable table = new JTable(tableModel);
-        JScrollPane scrollPane = new JScrollPane(table);
-        table.setFillsViewportHeight(true);
-
+    private void createAndShowGUI() {
+        // Composants du formulaire pour ajouter un capteur
         JTextField idField = new JTextField(5);
         JCheckBox statutCheckBox = new JCheckBox("Actif");
         JCheckBox presenceCheckBox = new JCheckBox("Présent");
         JCheckBox problemeCheckBox = new JCheckBox("Problème détecté");
         JButton ajouterButton = new JButton("Ajouter");
-        //JButton rafraichirButton = new JButton("Rafraîchir la liste");
 
+        // Création d'un JPanel pour l'ajout de capteur
         JPanel formPanel = new JPanel();
         formPanel.add(new JLabel("ID Capteur:"));
         formPanel.add(idField);
@@ -51,8 +35,8 @@ public class SimuCapteurUI {
         formPanel.add(presenceCheckBox);
         formPanel.add(problemeCheckBox);
         formPanel.add(ajouterButton);
-        //formPanel.add(rafraichirButton);
 
+        // Action du bouton "Ajouter"
         ajouterButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -63,9 +47,11 @@ public class SimuCapteurUI {
 
                 if (!id.isEmpty()) {
                     try {
+                        // Création du nouveau capteur
                         Capteur capteur = new Capteur(id, statut, presence, probleme);
+                        // Ajout du capteur via le service
                         capteurService.insertCapteur(capteur);
-                        tableModel.addRow(new Object[]{id, statut ? "Actif" : "Inactif", presence ? "Oui" : "Non", probleme ? "Oui" : "Non"});
+                        // Réinitialisation du formulaire après ajout
                         idField.setText("");
                         statutCheckBox.setSelected(false);
                         presenceCheckBox.setSelected(false);
@@ -79,15 +65,17 @@ public class SimuCapteurUI {
             }
         });
 
-        //rafraichirButton.addActionListener(e -> table.repaint());
-
+        // Création de la fenêtre principale
         JFrame frame = new JFrame("Simulation des capteurs");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
-        frame.add(formPanel, BorderLayout.NORTH);
-        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(formPanel, BorderLayout.NORTH); // Ajout uniquement du formulaire
         frame.setVisible(true);
+
+        // Connexion à la base de données et récupération des capteurs si nécessaire (pas affichée ici)
+        // Capteurs capteurs = capteurService.getCapteursFromDatabase();
+        // Tu peux manipuler ces capteurs en arrière-plan si nécessaire sans les afficher
     }
 }

@@ -11,7 +11,7 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class SimuCapteurUI {
-
+ 
     private CapteurService capteurService;
 
     public SimuCapteurUI(Capteurs capteurs, CapteurService capteurService) {

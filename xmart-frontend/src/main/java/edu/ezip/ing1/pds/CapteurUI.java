@@ -25,18 +25,10 @@ public class CapteurUI {
         JLabel presenceLabel = new JLabel("Présence : ");
         JLabel problemeLabel = new JLabel("Problème détecté : ");
 
-        // Création d'une liste déroulante (JComboBox) pour afficher les IDs existants
-        JComboBox<String> idComboBox = new JComboBox<>();
-
-        // Remplir la JComboBox avec les IDs des capteurs existants
-        for (Capteur capteur : capteurs.getCapteurs()) {
-            idComboBox.addItem(capteur.getId());
-        }
-
-        // Formulaire pour la recherche par ID avec la liste déroulante
+        // Formulaire pour la recherche par ID
         JPanel searchPanel = new JPanel();
         searchPanel.add(new JLabel("ID Capteur:"));
-        searchPanel.add(idComboBox); // Remplacer le JTextField par le JComboBox
+        searchPanel.add(idField);
         searchPanel.add(rechercheButton);
 
         // Panel pour afficher les informations du capteur
@@ -46,12 +38,12 @@ public class CapteurUI {
         resultPanel.add(presenceLabel);
         resultPanel.add(problemeLabel);
 
-        // Recherche du capteur par ID lorsque l'on appuie sur le bouton "Rechercher"
+        // Recherche du capteur par ID
         rechercheButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                String id = (String) idComboBox.getSelectedItem(); // Récupérer l'ID sélectionné dans le JComboBox
-                if (id != null && !id.isEmpty()) {
+                String id = idField.getText().trim();
+                if (!id.isEmpty()) {
                     // Recherche du capteur par ID
                     Capteur capteur = null;
                     for (Capteur c : capteurs.getCapteurs()) {
@@ -70,7 +62,7 @@ public class CapteurUI {
                         JOptionPane.showMessageDialog(null, "Capteur non trouvé.", "Erreur", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "Veuillez sélectionner un ID de capteur.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Veuillez entrer un ID de capteur.", "Erreur", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });

@@ -22,7 +22,7 @@ public class UtilisateurUI {
     public void afficherUtilisateurs(Utilisateurs utilisateurs) {
         // Créer la fenêtre principale avec deux boutons
         JFrame frame = new JFrame("Gestion des Utilisateurs");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
 
@@ -67,7 +67,7 @@ public class UtilisateurUI {
     private void afficherListeUtilisateurs(Utilisateurs utilisateurs) {
         // Créer la fenêtre Swing pour afficher la liste des utilisateurs
         JFrame frame = new JFrame("Liste des Utilisateurs");
-        frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 600);
 
         // Créer les colonnes du tableau

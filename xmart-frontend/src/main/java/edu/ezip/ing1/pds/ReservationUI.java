@@ -7,39 +7,27 @@ import edu.ezip.ing1.pds.services.ReservationService;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class ReservationUI {
 
-    private ReservationService reservationService;
+    private final ReservationService reservationService;
 
     public ReservationUI(Reservations reservations, ReservationService reservationService) {
         this.reservationService = reservationService;
         SwingUtilities.invokeLater(() -> createAndShowGUI(reservations));
     }
-    // informations que l'on va sortir dans notre table
-    private void createAndShowGUI(Reservations reservations) {
-        DefaultTableModel tableModel = new DefaultTableModel();
-        tableModel.addColumn("ID Réservation");
-        tableModel.addColumn("Nom");
-        tableModel.addColumn("Date");
-        tableModel.addColumn("Heure Début");
-        tableModel.addColumn("Heure Fin");
-        tableModel.addColumn("Type");
-        tableModel.addColumn("Description");
 
-        // vérifier que les informations de "réservation", ne sont pas nulles pour ajouter les informations
-        if (reservations != null && reservations.getReservations() != null && !reservations.getReservations().isEmpty()) {
+    private void createAndShowGUI(Reservations reservations) {
+        DefaultTableModel tableModel = new DefaultTableModel(new String[]{
+                "ID Réservation", "Nom", "Date", "Heure Début", "Heure Fin", "Type", "Description"
+        }, 0);
+
+        if (reservations != null && reservations.getReservations() != null) {
             for (Reservation reservation : reservations.getReservations()) {
                 tableModel.addRow(new Object[]{
-                        reservation.getId(),
-                        reservation.getName(),
-                        reservation.getDate(),
-                        reservation.getHeuredeb(),
-                        reservation.getHeurefin(),
-                        reservation.getType(),
+                        reservation.getId(), reservation.getName(), reservation.getDate(),
+                        reservation.getHeuredeb(), reservation.getHeurefin(), reservation.getType(),
                         reservation.getDescription()
                 });
             }
@@ -49,69 +37,52 @@ public class ReservationUI {
         JScrollPane scrollPane = new JScrollPane(table);
         table.setFillsViewportHeight(true);
 
-        JTextField idField = new JTextField(5);
-        JTextField nameField = new JTextField(10);
-        JTextField dateField = new JTextField(10);
-        JTextField heureDebField = new JTextField(10);
-        JTextField heureFinField = new JTextField(10);
-        JTextField typeField = new JTextField(10);
-        JTextField descriptionField = new JTextField(15);
+        JPanel formPanel = new JPanel(new GridLayout(4, 4, 5, 5));
+        JTextField[] fields = new JTextField[7];
+        String[] labels = {"ID Réservation:", "Nom:", "Date:", "Heure Début:", "Heure Fin:", "Type:", "Description:"};
+
+        for (int i = 0; i < labels.length; i++) {
+            formPanel.add(new JLabel(labels[i]));
+            fields[i] = new JTextField(10);
+            formPanel.add(fields[i]);
+        }
+
         JButton ajouterButton = new JButton("Ajouter");
-        JButton rafraichirButton = new JButton("Rafraîchir la liste");
+        JButton rafraichirButton = new JButton("Rafraîchir");
 
-        // potentiellement pour ajouter des réservations à l'avenir
-        JPanel formPanel = new JPanel();
-        formPanel.add(new JLabel("ID Réservation:"));
-        formPanel.add(idField);
-        formPanel.add(new JLabel("Nom:"));
-        formPanel.add(nameField);
-        formPanel.add(new JLabel("Date:"));
-        formPanel.add(dateField);
-        formPanel.add(new JLabel("Heure Début:"));
-        formPanel.add(heureDebField);
-        formPanel.add(new JLabel("Heure Fin:"));
-        formPanel.add(heureFinField);
-        formPanel.add(new JLabel("Type:"));
-        formPanel.add(typeField);
-        formPanel.add(new JLabel("Description:"));
-        formPanel.add(descriptionField);
-        formPanel.add(ajouterButton);
-        //formPanel.add(rafraichirButton);
+        ajouterButton.addActionListener(e -> {
+            try {
+                String id = fields[0].getText().trim();
+                String name = fields[1].getText().trim();
+                String date = fields[2].getText().trim();
+                String heureDeb = fields[3].getText().trim();
+                String heureFin = fields[4].getText().trim();
+                String type = fields[5].getText().trim();
+                String description = fields[6].getText().trim();
 
-        ajouterButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                String id = idField.getText().trim();
-                String name = nameField.getText().trim();
-                String date = dateField.getText().trim();
-                String heureDeb = heureDebField.getText().trim();
-                String heureFin = heureFinField.getText().trim();
-                String type = typeField.getText().trim();
-                String description = descriptionField.getText().trim();
-
-                if (!id.isEmpty()) {
-                    try {
-                        Reservation reservation = new Reservation(id, name, java.sql.Date.valueOf(date),
-                                java.sql.Time.valueOf(heureDeb), java.sql.Time.valueOf(heureFin), type, description);
-                        reservationService.insertReservation(reservation);
-                        tableModel.addRow(new Object[]{id, name, date, heureDeb, heureFin, type, description});
-                        idField.setText("");
-                        nameField.setText("");
-                        dateField.setText("");
-                        heureDebField.setText("");
-                        heureFinField.setText("");
-                        typeField.setText("");
-                        descriptionField.setText("");
-                    } catch (IOException | InterruptedException ex) {
-                        JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout de la réservation.", "Erreur", JOptionPane.ERROR_MESSAGE);
-                    }
-                } else {
+                if (id.isEmpty()) {
                     JOptionPane.showMessageDialog(null, "Veuillez remplir tous les champs.", "Erreur", JOptionPane.ERROR_MESSAGE);
+                    return;
                 }
+
+                Reservation reservation = new Reservation(id, name, java.sql.Date.valueOf(date),
+                        java.sql.Time.valueOf(heureDeb), java.sql.Time.valueOf(heureFin), type, description);
+                reservationService.insertReservation(reservation);
+                tableModel.addRow(new Object[]{id, name, date, heureDeb, heureFin, type, description});
+
+                for (JTextField field : fields) field.setText("");
+            } catch (IOException ex) {
+                JOptionPane.showMessageDialog(null, "Erreur lors de l'ajout de la réservation.", "Erreur", JOptionPane.ERROR_MESSAGE);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Données invalides.", "Erreur", JOptionPane.ERROR_MESSAGE);
             }
         });
 
-        //rafraichirButton.addActionListener(e -> table.repaint());
+        rafraichirButton.addActionListener(e -> table.repaint());
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(ajouterButton);
+        buttonPanel.add(rafraichirButton);
 
         JFrame frame = new JFrame("Gestion des Réservations");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
@@ -120,6 +91,7 @@ public class ReservationUI {
         frame.setLayout(new BorderLayout());
         frame.add(formPanel, BorderLayout.NORTH);
         frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
 }

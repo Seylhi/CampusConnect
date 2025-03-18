@@ -1,90 +1,81 @@
 package edu.ezip.ing1.pds;
 
-import edu.ezip.ing1.pds.business.dto.Reservations;
-import edu.ezip.ing1.pds.business.dto.Utilisateurs;
-import edu.ezip.ing1.pds.business.dto.Capteurs;
-import edu.ezip.ing1.pds.client.commons.ConfigLoader;
-import edu.ezip.ing1.pds.client.commons.NetworkConfig;
-import edu.ezip.ing1.pds.services.UtilisateurService;
-import edu.ezip.ing1.pds.services.CapteurService;
-import edu.ezip.ing1.pds.services.ReservationService;
+import edu.ezip.ing1.pds.business.dto.*;
+import edu.ezip.ing1.pds.client.commons.*;
+import edu.ezip.ing1.pds.services.*;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.io.IOException;
 
 public class MainFrontEnd {
 
-    private final static String networkConfigFile = "network.yaml";
+    private static final String NETWORK_CONFIG_FILE = "network.yaml";
 
     public static void main(String[] args) throws IOException, InterruptedException {
 
-        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, networkConfigFile);
+        // Chargement de la configuration réseau
+        final NetworkConfig networkConfig = ConfigLoader.loadConfig(NetworkConfig.class, NETWORK_CONFIG_FILE);
 
-        // Créer le service des capteurs
+        // Initialisation des services
         final CapteurService capteurService = new CapteurService(networkConfig);
-        Capteurs capteurs = capteurService.selectCapteurs();
         final UtilisateurService utilisateurService = new UtilisateurService(networkConfig);
-        Utilisateurs utilisateurs = utilisateurService.selectUtilisateurs();
         final ReservationService reservationService = new ReservationService(networkConfig);
+
+        // Récupération des données
+        Capteurs capteurs = capteurService.selectCapteurs();
+        Utilisateurs utilisateurs = utilisateurService.selectUtilisateurs();
         Reservations reservations = reservationService.selectReservations();
 
-        // Création de la fenêtre principale
-        JFrame frame = new JFrame("Menu Principal");
+        // Création et configuration de la fenêtre principale
+        JFrame frame = new JFrame("CAMPUS CONNECT");
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        frame.setSize(400, 300);
+        frame.setSize(600, 300);
         frame.setLocationRelativeTo(null);
 
-        // Création d'un panel avec un layout vertical
+        // Création du panel principal
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 1, 10, 10));
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.setBorder(BorderFactory.createEmptyBorder(15, 20, 15, 20));
 
-        // Bouton pour ouvrir l'interface des capteurs
-        JButton capteurSimuButton = new JButton("Simulation capteurs");
-        JButton capteurButton = new JButton("Capteurs");
+        JLabel titleLabel = new JLabel("Bienvenue dans l'application de gestion scolaire CAMPUS CONNECT !");
+        titleLabel.setAlignmentX(Component.CENTER_ALIGNMENT);
+        titleLabel.setBorder(BorderFactory.createEmptyBorder(10, 0, 10, 0));
+
+        // Création des boutons
         JButton utilisateurButton = new JButton("Utilisateurs");
-        JButton reservationButton = new JButton("Reservations");
+        JButton reservationButton = new JButton("Réservations");
+        JButton capteurButton = new JButton("Capteurs");
+        JButton capteurSimuButton = new JButton("Simulation capteurs");
 
-        // ActionListener pour ouvrir la fenêtre CapteurUI
-        capteurSimuButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new SimuCapteurUI(capteurs, capteurService);
-            }
-        });
-        capteurButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new CapteurUI(capteurs, capteurService);
-            }
-        });
-        utilisateurButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                UtilisateurUI utilisateurUI = new UtilisateurUI();
-                utilisateurUI.afficherUtilisateurs(utilisateurs);
-            }
-        });
 
-        reservationButton.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                new ReservationUI(reservations, reservationService);
-            }
-        });
+        capteurSimuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        capteurButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        utilisateurButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        reservationButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
-        // Ajouter le bouton au panel
-        panel.add(capteurSimuButton);
-        panel.add(reservationButton);
-        panel.add(utilisateurButton);
+        // Ajout des événements aux boutons
+        capteurSimuButton.addActionListener((ActionEvent e) -> new SimuCapteurUI(capteurs, capteurService));
+        capteurButton.addActionListener((ActionEvent e) -> new CapteurUI(capteurs, capteurService));
+        utilisateurButton.addActionListener((ActionEvent e) -> new UtilisateurUI().afficherUtilisateurs(utilisateurs));
+        reservationButton.addActionListener((ActionEvent e) -> new ReservationUI(reservations, reservationService));
+
+        // Ajout des composants au panel
+        panel.add(titleLabel);
+        panel.add(Box.createVerticalStrut(10));
         panel.add(capteurButton);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(utilisateurButton);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(reservationButton);
+        panel.add(Box.createVerticalStrut(10));
+        panel.add(capteurSimuButton);
 
-        // Ajouter le panel à la fenêtre principale
+        // Ajout du panel à la fenêtre
         frame.add(panel);
 
-        // Afficher la fenêtre principale
+        // Affichage de la fenêtre principale
         frame.setVisible(true);
     }
 }

@@ -144,7 +144,7 @@ public class CapteurUI {
                     Capteur capteur = new Capteur();
                     capteur.setId(id);
 
-                    //capteurService.deleteCapteur(capteur);
+                    capteurService.deleteCapteur(capteur);
                     JOptionPane.showMessageDialog(frame, "Capteur supprimé avec succès !");
 
                     // Supprimer la ligne du tableau
@@ -270,7 +270,7 @@ public class CapteurUI {
                 capteur.setPresence("Oui".equals(presence));
                 capteur.setDetectionProbleme("Oui".equals(detection));
 
-                //capteurService.updateCapteur(capteur);
+                capteurService.updateCapteur(capteur);
                 JOptionPane.showMessageDialog(frame, "Capteur modifié avec succès !");
 
                 // Mettre à jour la ligne dans le tableau

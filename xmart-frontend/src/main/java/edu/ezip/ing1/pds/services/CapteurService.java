@@ -5,6 +5,7 @@ import java.util.ArrayDeque;
 import java.util.Deque;
 import java.util.UUID;
 
+import edu.ezip.ing1.pds.requests.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.event.Level;
@@ -18,8 +19,6 @@ import edu.ezip.ing1.pds.business.dto.Capteurs;
 import edu.ezip.ing1.pds.client.commons.ClientRequest;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
-import edu.ezip.ing1.pds.requests.InsertCapteursClientRequest;
-import edu.ezip.ing1.pds.requests.SelectAllCapteursClientRequest;
 
 public class CapteurService {
 
@@ -29,6 +28,7 @@ public class CapteurService {
     final String insertRequestOrder = "INSERT_CAPTEUR";
     final String selectRequestOrder = "SELECT_ALL_CAPTEURS";
     final String deleteRequestOrder = "DELETE_CAPTEUR";
+    final String updateRequestOrder = "UPDATE_CAPTEUR";
 
     private final NetworkConfig networkConfig;
 
@@ -42,6 +42,21 @@ public class CapteurService {
     public void insertCapteur(Capteur capteur) throws InterruptedException, IOException {
         processCapteur(capteur, insertRequestOrder);
     }
+
+    /**
+     *Modifier un capteur et le changer de la base de donnes.
+     */
+    public void updateCapteur(Capteur capteur) throws InterruptedException, IOException {
+        processCapteur(capteur, updateRequestOrder);
+    }
+
+    /**
+     *SUPPRIMER un capteur.
+     */
+    public void deleteCapteur(Capteur capteur) throws InterruptedException, IOException {
+        processCapteur(capteur, deleteRequestOrder);
+    }
+
 
     /**
      * Fonction générique pour traiter un capteur en fonction d'une requête spécifique.
@@ -61,8 +76,19 @@ public class CapteurService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-        final InsertCapteursClientRequest capteurRequest = new InsertCapteursClientRequest(
-                networkConfig, 0, request, capteur, requestBytes);
+        ClientRequest capteurRequest;
+
+        if ("INSERT_CAPTEUR".equals(requestOrder)) {
+            capteurRequest = new InsertCapteursClientRequest(networkConfig, 0, request, capteur, requestBytes);
+        } else if ("UPDATE_CAPTEUR".equals(requestOrder)) {
+            capteurRequest = new UpdateCapteursClientRequest(networkConfig, 0, request, capteur, requestBytes);
+        } else if ("DELETE_CAPTEUR".equals(requestOrder)) {
+            capteurRequest = new DeleteCapteursClientRequest(networkConfig, 0, request, capteur, requestBytes);
+        } else {
+            throw new IllegalArgumentException("Requête non supportée : " + requestOrder);
+        }
+
+
         capteurRequests.push(capteurRequest);
 
         while (!capteurRequests.isEmpty()) {

@@ -36,6 +36,8 @@ public class XMartCityService {
         DELETE_UTILISATEUR("DELETE FROM Utilisateur WHERE id_utilisateur = ?"),
         SELECT_ALL_CAPTEURS("SELECT * FROM Capteurs "),
         INSERT_CAPTEUR("INSERT INTO Capteurs (id_capteur , statut, presence , detection_probleme) VALUES (?, ?, ?, ?)"),
+        UPDATE_CAPTEUR("UPDATE Capteurs SET statut = ?, presence = ?, detection_probleme = ? WHERE id_capteur = ?"),
+        DELETE_CAPTEUR("DELETE FROM Capteurs WHERE id_capteur = ?"),
         SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations");
         private final String query;
 
@@ -100,6 +102,12 @@ public class XMartCityService {
                 break;
            case INSERT_CAPTEUR:
                 response = insertCapteur(request, connection);
+                break;
+            case UPDATE_CAPTEUR:
+                response = updateCapteur(request, connection);
+                break;
+            case DELETE_CAPTEUR:
+                response = deleteCapteur(request, connection);
                 break;
             case SELECT_ALL_RESERVATIONS:
                 response = selectAllReservations(request, connection);
@@ -339,6 +347,42 @@ public class XMartCityService {
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteurs));
     }
+
+    private Response updateCapteur(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Capteur capteur = objectMapper.readValue(request.getRequestBody(), Capteur.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_CAPTEUR.query);
+        stmt.setBoolean(1, capteur.getStatut());
+        stmt.setBoolean(2, capteur.getPresence());
+        stmt.setBoolean(3, capteur.getDetectionProbleme());
+        stmt.setString(4, capteur.getId());
+
+        int rowsUpdated = stmt.executeUpdate();
+
+        if (rowsUpdated == 0) {
+            return new Response(request.getRequestId(), "Capteur non trouvé ou aucune mise à jour effectuée.");
+        }
+
+        return new Response(request.getRequestId(), "Capteur mis à jour avec succès.");
+    }
+
+    private Response deleteCapteur(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Capteur capteur = objectMapper.readValue(request.getRequestBody(), Capteur.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_CAPTEUR.query);
+        stmt.setString(1, capteur.getId());
+
+        int rowsDeleted = stmt.executeUpdate();
+
+        if (rowsDeleted == 0) {
+            return new Response(request.getRequestId(), "Capteur non trouvé ou déjà supprimé.");
+        }
+
+        return new Response(request.getRequestId(), "Capteur supprimé avec succès.");
+    }
+
 
     private Response selectAllReservations(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();

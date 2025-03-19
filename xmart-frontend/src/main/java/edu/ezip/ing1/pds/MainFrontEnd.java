@@ -58,7 +58,7 @@ public class MainFrontEnd {
         // Ajout des événements aux boutons
         capteurSimuButton.addActionListener((ActionEvent e) -> new SimuCapteurUI(capteurs, capteurService));
         capteurButton.addActionListener((ActionEvent e) -> new CapteurUI(capteurs, capteurService));
-        utilisateurButton.addActionListener((ActionEvent e) -> new UtilisateurUI().afficherUtilisateurs(utilisateurs));
+        utilisateurButton.addActionListener((ActionEvent e) -> new UtilisateurUI(networkConfig).afficherUtilisateurs(utilisateurs));
         reservationButton.addActionListener((ActionEvent e) -> new ReservationUI(reservations, reservationService));
 
         // Ajout des composants au panel

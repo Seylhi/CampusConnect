@@ -69,7 +69,7 @@ public class UtilisateurService {
             final ClientRequest processedRequest = utilisateurRequests.pop();
             processedRequest.join();
             final Utilisateur processedUtilisateur = (Utilisateur) processedRequest.getInfo();
-            logger.debug("Thread {} terminé : {} {} --> {}",
+            logger.debug("Thread {} terminé : {} {} {}  --> {}",
                     processedRequest.getThreadName(),
                     processedUtilisateur.getNom(), processedUtilisateur.getPrenom(), processedUtilisateur.getEmail(),
                     processedRequest.getResult());
@@ -89,28 +89,36 @@ public class UtilisateurService {
         request.setRequestOrder(selectRequestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
-        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+
+        logger.debug("Envoi de la requête SELECT_ALL_UTILISATEURS avec ID {}", requestId);
 
         final SelectAllUtilisateursClientRequest utilisateurRequest = new SelectAllUtilisateursClientRequest(
                 networkConfig, 0, request, null, requestBytes);
         utilisateurRequests.push(utilisateurRequest);
 
+        logger.debug("Taille de utilisateurRequests : {}", utilisateurRequests.size());
+
         if (!utilisateurRequests.isEmpty()) {
             final ClientRequest joinedUtilisateurRequest = utilisateurRequests.pop();
             joinedUtilisateurRequest.join();
-            logger.debug("Thread {} terminé.", joinedUtilisateurRequest.getThreadName());
+            logger.debug(" Thread {} terminé.", joinedUtilisateurRequest.getThreadName());
 
-            Utilisateurs utilisateurs = (Utilisateurs) joinedUtilisateurRequest.getResult();
-            if (utilisateurs != null) {
-                logger.info("{} utilisateurs récupérés.", utilisateurs.getUtilisateurs().size());
+            Object result = joinedUtilisateurRequest.getResult();
+            logger.debug(" Résultat de getResult() : {}", result);
+
+            if (result instanceof Utilisateurs) {
+                Utilisateurs utilisateurs = (Utilisateurs) result;
+                logger.info(" {} utilisateurs récupérés.", utilisateurs.getUtilisateurs().size());
                 return utilisateurs;
             } else {
-                logger.warn("Aucun utilisateur trouvé.");
+                logger.warn(" Aucun utilisateur trouvé.");
                 return null;
             }
         } else {
-            logger.error("Erreur : Aucun utilisateur récupéré.");
+            logger.error("Aucun utilisateur récupéré.");
             return null;
         }
     }
+
 }
+

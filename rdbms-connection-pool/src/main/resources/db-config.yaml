@@ -1,7 +1,7 @@
 databaseName: "BDD"
-host: "127.0.0.1"
-port: 3307
+host: "172.31.249.176"
+port: 3306
 username : "root"
-password: ""
-poolSize: 1
+password: "votre_mot_de_passe"
+poolSize: 2
 

@@ -13,7 +13,7 @@ import com.fasterxml.jackson.annotation.JsonRootName;
 
 @JsonRootName(value = "utilisateur")
 public class Utilisateur {
-    private String idUtilisateur;
+    private int idUtilisateur;
     private String nomUtilisateur;
     private String email;
     private String password;
@@ -34,26 +34,21 @@ public class Utilisateur {
 
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, idUtilisateur, nomUtilisateur, email, password, dateCreation.toString(), nom, prenom, String.valueOf(age), dateDeNaissance.toString(), sexe);
+        return buildPreparedStatement(preparedStatement, String.valueOf(idUtilisateur), nomUtilisateur, email, password, dateCreation.toString(), nom, prenom, String.valueOf(age), dateDeNaissance.toString(), sexe);
     }
 
-    public Utilisateur(String idUtilisateur, String nomUtilisateur, String email, String password, Date dateCreation,
-                       String nom, String prenom, int age, Date dateDeNaissance, String sexe) {
-        this.idUtilisateur = idUtilisateur;
+    public Utilisateur(String nomUtilisateur, String email, String password,
+                       String nom, String prenom) {
         this.nomUtilisateur = nomUtilisateur;
         this.email = email;
         this.password = password;
-        this.dateCreation = dateCreation;
         this.nom = nom;
         this.prenom = prenom;
-        this.age = age;
-        this.dateDeNaissance = dateDeNaissance;
-        this.sexe = sexe;
     }
 
-    public String getIdUtilisateur() { return idUtilisateur; }
+    public int getIdUtilisateur() { return idUtilisateur; }
     @JsonProperty("user_id")
-    public void setIdUtilisateur(String idUtilisateur) { this.idUtilisateur = idUtilisateur; }
+    public void setIdUtilisateur(int idUtilisateur) { this.idUtilisateur = idUtilisateur; }
 
     public String getNomUtilisateur() { return nomUtilisateur; }
     @JsonProperty("username")

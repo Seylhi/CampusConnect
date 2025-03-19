@@ -179,11 +179,11 @@ public class XMartCityService {
         stmt.setString(5, utilisateur.getPassword());
         stmt.executeUpdate();
 
-        final Statement stmt2 = connection.createStatement();
+        /*final Statement stmt2 = connection.createStatement();
         final ResultSet res = stmt2.executeQuery("SELECT LAST_INSERT_ID()");
         res.next();
 
-        utilisateur.setIdUtilisateur(res.getString(1));
+        utilisateur.setIdUtilisateur(res.getInt(1));*/
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateur));
     }
@@ -255,7 +255,7 @@ public class XMartCityService {
         Utilisateurs utilisateurs = new Utilisateurs();
         while (res.next()) {
             Utilisateur utilisateur = new Utilisateur();
-            utilisateur.setIdUtilisateur(res.getString(1));
+            utilisateur.setIdUtilisateur(res.getInt(1));
             utilisateur.setNomUtilisateur(res.getString(2));
             utilisateur.setEmail(res.getString(3));
             utilisateur.setPassword(res.getString(4));

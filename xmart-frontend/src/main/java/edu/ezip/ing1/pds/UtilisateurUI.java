@@ -2,6 +2,7 @@ package edu.ezip.ing1.pds;
 
 import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.business.dto.Utilisateurs;
+import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.UtilisateurService;
 
 import javax.swing.*;
@@ -15,8 +16,8 @@ public class UtilisateurUI {
 
     private UtilisateurService utilisateurService;
 
-    public UtilisateurUI() {
-        this.utilisateurService = utilisateurService;
+    public UtilisateurUI(NetworkConfig networkConfig) {
+        this.utilisateurService = new UtilisateurService(networkConfig);
     }
 
     public void afficherUtilisateurs(Utilisateurs utilisateurs) {
@@ -31,15 +32,16 @@ public class UtilisateurUI {
         panel.setLayout(new GridLayout(2, 1, 10, 10));
 
         // Boutons pour afficher la liste des utilisateurs et créer un nouveau utilisateur
-        JButton afficherButton = new JButton("Afficher Liste des Utilisateurs");
+        JButton afficherButton = new JButton("Liste des Utilisateurs");
         JButton creerButton = new JButton("Créer Nouveau Utilisateur");
+
 
         // ActionListener pour afficher la liste des utilisateurs
         afficherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 // Appeler la méthode pour afficher la liste des utilisateurs
-                afficherListeUtilisateurs(utilisateurs);
+                afficherListeUtilisateurs();
             }
         });
 
@@ -64,11 +66,24 @@ public class UtilisateurUI {
     }
 
     // Méthode pour afficher la liste des utilisateurs
-    private void afficherListeUtilisateurs(Utilisateurs utilisateurs) {
+    private void afficherListeUtilisateurs() {
+        Utilisateurs utilisateurs;
+        try {
+            utilisateurs = utilisateurService.selectUtilisateurs();
+        } catch (InterruptedException | IOException e) {
+            JOptionPane.showMessageDialog(null, "Erreur lors du chargement des utilisateurs : " + e.getMessage());
+            return;
+        }
+
+
+
         // Créer la fenêtre Swing pour afficher la liste des utilisateurs
         JFrame frame = new JFrame("Liste des Utilisateurs");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(800, 600);
+        frame.setSize(800, 400);
+        frame.setLocationRelativeTo(null);
+        frame.setLayout(new BorderLayout());
+        frame.setVisible(true);
 
         // Créer les colonnes du tableau
         String[] columnNames = {"ID", "Nom d'utilisateur", "Email", "Mot de passe", "Date de création",
@@ -114,8 +129,10 @@ public class UtilisateurUI {
     private void afficherFormulaireCreation() {
         JFrame frame = new JFrame("Créer un Utilisateur");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(400, 300);
+        frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
+        frame.setLayout(new BorderLayout());
+        frame.setVisible(true);
 
         // Panel pour contenir les champs du formulaire
         JPanel panel = new JPanel();

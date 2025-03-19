@@ -56,7 +56,7 @@ public class Capteur {
 
     @JsonProperty("capteur_presence")
     public void setPresence(boolean presence) {
-        this.presence = statut;
+        this.presence = presence;
     }
 
     @JsonProperty("capteur_detectionProbleme")

@@ -20,6 +20,8 @@ import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.commons.Request;
 import edu.ezip.ing1.pds.requests.InsertUtilisateursClientRequest;
 import edu.ezip.ing1.pds.requests.SelectAllUtilisateursClientRequest;
+import edu.ezip.ing1.pds.requests.UpdateUtilisateursClientRequest;
+import edu.ezip.ing1.pds.requests.DeleteUtilisateursClientRequest;
 
 public class UtilisateurService {
 
@@ -28,6 +30,7 @@ public class UtilisateurService {
 
     final String insertRequestOrder = "INSERT_UTILISATEUR";
     final String selectRequestOrder = "SELECT_ALL_UTILISATEURS";
+    final String updateRequestOrder = "UPDATE_UTILISATEUR";
     final String deleteRequestOrder = "DELETE_UTILISATEUR";
 
     private final NetworkConfig networkConfig;
@@ -42,6 +45,21 @@ public class UtilisateurService {
     public void insertUtilisateur(Utilisateur utilisateur) throws InterruptedException, IOException {
         processUtilisateur(utilisateur, insertRequestOrder);
     }
+
+    /**
+     *Modifier un utilisateur et le changer de la base de donnes.
+     */
+    public void updateUtilisateur(Utilisateur utilisateur) throws InterruptedException, IOException {
+        processUtilisateur(utilisateur, updateRequestOrder);
+    }
+
+    /**
+     *SUPPRIMER un utilisateur.
+     */
+    public void deleteUtilisateur(Utilisateur utilisateur) throws InterruptedException, IOException {
+        processUtilisateur(utilisateur, deleteRequestOrder);
+    }
+
 
     /**
      * Fonction générique pour traiter un utilisateur en fonction d'une requête spécifique.
@@ -61,8 +79,19 @@ public class UtilisateurService {
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
 
-        final InsertUtilisateursClientRequest utilisateurRequest = new InsertUtilisateursClientRequest(
-                networkConfig, 0, request, utilisateur, requestBytes);
+        ClientRequest utilisateurRequest;
+
+        if ("INSERT_UTILISATEUR".equals(requestOrder)) {
+            utilisateurRequest = new InsertUtilisateursClientRequest(networkConfig, 0, request, utilisateur, requestBytes);
+        } else if ("UPDATE_UTILISATEUR".equals(requestOrder)) {
+            utilisateurRequest = new UpdateUtilisateursClientRequest(networkConfig, 0, request, utilisateur, requestBytes);
+        } else if ("DELETE_UTILISATEUR".equals(requestOrder)) {
+            utilisateurRequest = new DeleteUtilisateursClientRequest(networkConfig, 0, request, utilisateur, requestBytes);
+        } else {
+            throw new IllegalArgumentException("Requête non supportée : " + requestOrder);
+        }
+
+
         utilisateurRequests.push(utilisateurRequest);
 
         while (!utilisateurRequests.isEmpty()) {
@@ -75,6 +104,7 @@ public class UtilisateurService {
                     processedRequest.getResult());
         }
     }
+
 
     /**
      * Récupère la liste des utilisateurs de la base de données.

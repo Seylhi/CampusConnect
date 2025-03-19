@@ -75,55 +75,106 @@ public class UtilisateurUI {
             return;
         }
 
-
-
-        // Créer la fenêtre Swing pour afficher la liste des utilisateurs
         JFrame frame = new JFrame("Liste des Utilisateurs");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 400);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
-        frame.setVisible(true);
 
-        // Créer les colonnes du tableau
-        String[] columnNames = {"ID", "Nom d'utilisateur", "Email", "Mot de passe", "Date de création",
-                "Nom", "Prénom", "Âge", "Date de naissance", "Sexe"};
-
-        // Créer un modèle de tableau pour y insérer les données
+        String[] columnNames = {"ID", "Nom d'utilisateur", "Email", "Mot de passe", "Nom", "Prénom"};
         DefaultTableModel tableModel = new DefaultTableModel(columnNames, 0);
+        JTable table = new JTable(tableModel);
+        table.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        JScrollPane scrollPane = new JScrollPane(table);
 
-        // Si des utilisateurs sont trouvés, on les ajoute au modèle du tableau
+        // Ajouter les données des utilisateurs
         if (utilisateurs != null && utilisateurs.getUtilisateurs() != null && !utilisateurs.getUtilisateurs().isEmpty()) {
-            for (final Utilisateur utilisateur : utilisateurs.getUtilisateurs()) {
+            for (Utilisateur utilisateur : utilisateurs.getUtilisateurs()) {
                 Object[] row = {
                         utilisateur.getIdUtilisateur(),
                         utilisateur.getNomUtilisateur(),
                         utilisateur.getEmail(),
                         utilisateur.getPassword(),
-                        utilisateur.getDateCreation(),
                         utilisateur.getNom(),
-                        utilisateur.getPrenom(),
-                        utilisateur.getAge(),
-                        utilisateur.getDateDeNaissance(),
-                        utilisateur.getSexe()
+                        utilisateur.getPrenom()
                 };
                 tableModel.addRow(row);
             }
         } else {
-            // Ajouter une ligne pour indiquer qu'aucun utilisateur n'a été trouvé
-            tableModel.addRow(new Object[]{"", "", "", "", "", "", "", "", "", "Aucun utilisateur trouvé"});
+            tableModel.addRow(new Object[]{"", "Aucun utilisateur trouvé", "", "", ""});
         }
 
-        // Créer le tableau avec le modèle de données
-        JTable table = new JTable(tableModel);
+        // Ajout du bouton "Modifier"
+        JButton modifierButton = new JButton("Modifier Utilisateur");
+        modifierButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(frame, "Veuillez sélectionner un utilisateur.");
+                return;
+            }
 
-        // Ajouter le tableau dans un JScrollPane pour pouvoir faire défiler
-        JScrollPane scrollPane = new JScrollPane(table);
-        frame.add(scrollPane);
+            int id = (int) tableModel.getValueAt(selectedRow, 0);
+            String nomUtilisateur = (String) tableModel.getValueAt(selectedRow, 1);
+            String email = (String) tableModel.getValueAt(selectedRow, 2);
+            String password = (String) tableModel.getValueAt(selectedRow, 3);
+            String nom = (String) tableModel.getValueAt(selectedRow, 4);
+            String prenom = (String) tableModel.getValueAt(selectedRow, 5);
 
-        // Afficher la fenêtre
+            Utilisateur utilisateur = new Utilisateur();
+            utilisateur.setIdUtilisateur(id);
+            utilisateur.setNomUtilisateur(nomUtilisateur);
+            utilisateur.setEmail(email);
+            utilisateur.setPassword(password);
+            utilisateur.setNom(nom);
+            utilisateur.setPrenom(prenom);
+
+            afficherFormulaireModification(utilisateur, tableModel, selectedRow);
+        });
+
+        //Ajout du bouton "Supprimer"
+        JButton supprimerButton = new JButton("Supprimer Utilisateur");
+        supprimerButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(frame, "Veuillez sélectionner un utilisateur à supprimer.");
+                return;
+            }
+
+            int id = (int) tableModel.getValueAt(selectedRow, 0);
+            String nomUtilisateur = (String) tableModel.getValueAt(selectedRow, 1);
+
+            int confirm = JOptionPane.showConfirmDialog(frame,
+                    "Voulez-vous vraiment supprimer l'utilisateur " + nomUtilisateur + " ?",
+                    "Confirmation",
+                    JOptionPane.YES_NO_OPTION);
+
+            if (confirm == JOptionPane.YES_OPTION) {
+                try {
+                    Utilisateur utilisateur = new Utilisateur();
+                    utilisateur.setIdUtilisateur(id);
+
+                    utilisateurService.deleteUtilisateur(utilisateur);
+                    JOptionPane.showMessageDialog(frame, "Utilisateur supprimé avec succès !");
+
+                    //Supprimer la ligne du tableau
+                    tableModel.removeRow(selectedRow);
+                } catch (Exception ex) {
+                    JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression : " + ex.getMessage());
+                }
+            }
+        });
+
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout());
+        panel.add(modifierButton);
+        panel.add(supprimerButton);
+
+        frame.add(scrollPane, BorderLayout.CENTER);
+        frame.add(panel, BorderLayout.SOUTH);
         frame.setVisible(true);
     }
+
+
 
     // Méthode pour afficher un formulaire de création d'utilisateur
     private void afficherFormulaireCreation() {
@@ -197,4 +248,80 @@ public class UtilisateurUI {
         frame.add(panel);
         frame.setVisible(true);
     }
+
+    private void afficherFormulaireModification(Utilisateur utilisateur, DefaultTableModel tableModel, int selectedRow) {
+        JFrame frame = new JFrame("Modifier un Utilisateur");
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.setSize(400, 300);
+        frame.setLocationRelativeTo(null);
+
+        JPanel panel = new JPanel(new GridLayout(7, 2, 10, 10));
+
+        panel.add(new JLabel("ID Utilisateur :"));
+        JTextField idField = new JTextField(String.valueOf(utilisateur.getIdUtilisateur()));
+        idField.setEditable(false);
+        panel.add(idField);
+
+        panel.add(new JLabel("Nom d'utilisateur :"));
+        JTextField nomUtilisateurField = new JTextField(utilisateur.getNomUtilisateur());
+        panel.add(nomUtilisateurField);
+
+        panel.add(new JLabel("Email :"));
+        JTextField emailField = new JTextField(utilisateur.getEmail());
+        panel.add(emailField);
+
+        panel.add(new JLabel("Mot de passe (Laissez vide pour ne pas changer) :"));
+        JTextField passwordField = new JTextField();
+        panel.add(passwordField);
+
+        panel.add(new JLabel("Nom :"));
+        JTextField nomField = new JTextField(utilisateur.getNom());
+        panel.add(nomField);
+
+        panel.add(new JLabel("Prénom :"));
+        JTextField prenomField = new JTextField(utilisateur.getPrenom());
+        panel.add(prenomField);
+
+        JButton updateButton = new JButton("Modifier");
+        panel.add(updateButton);
+
+        updateButton.addActionListener(e -> {
+            try {
+                String nomUtilisateur = nomUtilisateurField.getText();
+                String email = emailField.getText();
+                String password = passwordField.getText();
+                String nom = nomField.getText();
+                String prenom = prenomField.getText();
+
+                // Mise à jour de l'utilisateur
+                utilisateur.setNomUtilisateur(nomUtilisateur);
+                utilisateur.setEmail(email);
+                utilisateur.setNom(nom);
+                utilisateur.setPrenom(prenom);
+
+                if (!password.isEmpty()) {
+                    utilisateur.setPassword(password);
+                }
+
+                utilisateurService.updateUtilisateur(utilisateur);
+                JOptionPane.showMessageDialog(frame, "Utilisateur modifié avec succès !");
+
+                // Mettre à jour la ligne dans le tableau
+                tableModel.setValueAt(nomUtilisateur, selectedRow, 1);
+                tableModel.setValueAt(email, selectedRow, 2);
+                tableModel.setValueAt(password.isEmpty() ? tableModel.getValueAt(selectedRow, 3) : password, selectedRow, 3);
+                tableModel.setValueAt(nom, selectedRow, 4);
+                tableModel.setValueAt(prenom, selectedRow, 5);
+
+                frame.dispose();
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(frame, "Erreur lors de la modification : " + ex.getMessage());
+            }
+        });
+
+        frame.add(panel);
+        frame.setVisible(true);
+    }
+
+
 }

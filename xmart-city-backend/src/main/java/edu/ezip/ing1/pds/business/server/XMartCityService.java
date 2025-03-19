@@ -32,6 +32,8 @@ public class XMartCityService {
         //INSERT_STUDENT("INSERT into students (name, firstname, groupname) values (?, ?, ?)");
         SELECT_ALL_UTILISATEURS("SELECT * FROM Utilisateur"),
         INSERT_UTILISATEUR("INSERT INTO Utilisateur (nom_utilisateur, nom, prenom, email, password) VALUES (?, ?, ?, ?, ?)"),
+        UPDATE_UTILISATEUR("UPDATE Utilisateur SET nom_utilisateur = ?, nom = ?, prenom = ?, email = ?, password = ? WHERE id_utilisateur = ?"),
+        DELETE_UTILISATEUR("DELETE FROM Utilisateur WHERE id_utilisateur = ?"),
         SELECT_ALL_CAPTEURS("SELECT * FROM Capteurs "),
         SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations");
         private final String query;
@@ -85,6 +87,12 @@ public class XMartCityService {
                 break;
             case INSERT_UTILISATEUR:
                 response = insertUtilisateur(request, connection);
+                break;
+            case UPDATE_UTILISATEUR:
+                response = updateUtilisateur(request, connection);
+                break;
+            case DELETE_UTILISATEUR:
+                response = deleteUtilisateur(request, connection);
                 break;
             case SELECT_ALL_CAPTEURS:
                 response = selectAllCapteurs(request, connection);
@@ -275,6 +283,45 @@ public class XMartCityService {
         }
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateurs));
     }
+
+    private Response updateUtilisateur(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Utilisateur utilisateur = objectMapper.readValue(request.getRequestBody(), Utilisateur.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_UTILISATEUR.query);
+        stmt.setString(1, utilisateur.getNomUtilisateur());
+        stmt.setString(2, utilisateur.getNom());
+        stmt.setString(3, utilisateur.getPrenom());
+        stmt.setString(4, utilisateur.getEmail());
+        stmt.setString(5, utilisateur.getPassword());
+        stmt.setInt(6, utilisateur.getIdUtilisateur());
+
+        int rowsUpdated = stmt.executeUpdate();
+
+        if (rowsUpdated == 0) {
+            return new Response(request.getRequestId(), "Utilisateur non trouvé ou aucune mise à jour effectuée.");
+        }
+
+        return new Response(request.getRequestId(), "Utilisateur mis à jour avec succès.");
+    }
+
+    private Response deleteUtilisateur(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Utilisateur utilisateur = objectMapper.readValue(request.getRequestBody(), Utilisateur.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_UTILISATEUR.query);
+        stmt.setInt(1, utilisateur.getIdUtilisateur());
+
+        int rowsDeleted = stmt.executeUpdate();
+
+        if (rowsDeleted == 0) {
+            return new Response(request.getRequestId(), "Utilisateur non trouvé ou déjà supprimé.");
+        }
+
+        return new Response(request.getRequestId(), "Utilisateur supprimé avec succès.");
+    }
+
+
 
     private Response selectAllCapteurs(final Request request, final Connection connection) throws SQLException, JsonProcessingException {
         final ObjectMapper objectMapper = new ObjectMapper();

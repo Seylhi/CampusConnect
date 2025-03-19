@@ -47,17 +47,17 @@ public class MainFrontEnd {
         JButton utilisateurButton = new JButton("Utilisateurs");
         JButton reservationButton = new JButton("Réservations");
         JButton capteurButton = new JButton("Capteurs");
-        JButton capteurSimuButton = new JButton("Simulation capteurs");
+        //JButton capteurSimuButton = new JButton("Simulation capteurs");
 
 
-        capteurSimuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
+        //capteurSimuButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         capteurButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         utilisateurButton.setAlignmentX(Component.CENTER_ALIGNMENT);
         reservationButton.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         // Ajout des événements aux boutons
-        capteurSimuButton.addActionListener((ActionEvent e) -> new SimuCapteurUI(capteurs, capteurService));
-        capteurButton.addActionListener((ActionEvent e) -> new CapteurUI(capteurs, capteurService));
+        //capteurSimuButton.addActionListener((ActionEvent e) -> new SimuCapteurUI(networkConfig).createAndShowSimuUI(capteurs));
+        capteurButton.addActionListener((ActionEvent e) -> new CapteurUI(networkConfig).afficherCapteurs(capteurs));
         utilisateurButton.addActionListener((ActionEvent e) -> new UtilisateurUI(networkConfig).afficherUtilisateurs(utilisateurs));
         reservationButton.addActionListener((ActionEvent e) -> new ReservationUI(reservations, reservationService));
 
@@ -70,7 +70,7 @@ public class MainFrontEnd {
         panel.add(Box.createVerticalStrut(10));
         panel.add(reservationButton);
         panel.add(Box.createVerticalStrut(10));
-        panel.add(capteurSimuButton);
+        //panel.add(capteurSimuButton);
 
         // Ajout du panel à la fenêtre
         frame.add(panel);

@@ -35,6 +35,7 @@ public class XMartCityService {
         UPDATE_UTILISATEUR("UPDATE Utilisateur SET nom_utilisateur = ?, nom = ?, prenom = ?, email = ?, password = ? WHERE id_utilisateur = ?"),
         DELETE_UTILISATEUR("DELETE FROM Utilisateur WHERE id_utilisateur = ?"),
         SELECT_ALL_CAPTEURS("SELECT * FROM Capteurs "),
+        INSERT_CAPTEUR("INSERT INTO Capteurs (id_capteur , statut, presence , detection_probleme) VALUES (?, ?, ?, ?)"),
         SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations");
         private final String query;
 
@@ -97,9 +98,9 @@ public class XMartCityService {
             case SELECT_ALL_CAPTEURS:
                 response = selectAllCapteurs(request, connection);
                 break;
-           /* case INSERT_CAPTEUR:
+           case INSERT_CAPTEUR:
                 response = insertCapteur(request, connection);
-                break;*/
+                break;
             case SELECT_ALL_RESERVATIONS:
                 response = selectAllReservations(request, connection);
                 break;
@@ -196,25 +197,25 @@ public class XMartCityService {
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(utilisateur));
     }
 
-    /*private Response insertCapteur(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response insertCapteur(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Capteur capteur = objectMapper.readValue(request.getRequestBody(), Capteur.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_CAPTEUR.query1);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_CAPTEUR.query);
         stmt.setString(1, capteur.getId());
         stmt.setBoolean(2, capteur.getPresence());
         stmt.setBoolean(3, capteur.getStatut());
         stmt.setBoolean(4, capteur.getDetectionProbleme());
         stmt.executeUpdate();
 
-        final Statement stmt2 = connection.createStatement();
+        /*final Statement stmt2 = connection.createStatement();
         final ResultSet res = stmt2.executeQuery("SELECT LAST_INSERT_ID()");
         res.next();
 
-        capteur.setId(res.getString(1));
+        capteur.setId(res.getString(1));*/
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteur));
-    }*/
+    }
 
     /*private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();

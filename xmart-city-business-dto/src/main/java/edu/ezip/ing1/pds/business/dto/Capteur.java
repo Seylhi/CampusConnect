@@ -21,12 +21,12 @@ public class Capteur {
     }
     public final Capteur build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResulset(resultSet,"id_capteur");
+        setFieldsFromResulset(resultSet,"id_capteur", "statut", "presence", "detection_probleme");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, id);
+        return buildPreparedStatement(preparedStatement, id , String.valueOf(statut) , String.valueOf(presence) , String.valueOf(detectionProbleme));
     }
     public Capteur( String id, boolean statut, boolean presence, boolean detectionProbleme) {
         this.id = id;

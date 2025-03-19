@@ -69,9 +69,9 @@ public class CapteurService {
             final ClientRequest processedRequest = capteurRequests.pop();
             processedRequest.join();
             final Capteur processedCapteur = (Capteur) processedRequest.getInfo();
-            logger.debug("Thread {} terminé : {} {} --> {}",
+            logger.debug("Thread {} terminé : {} {} {}  --> {}",
                     processedRequest.getThreadName(),
-                    processedCapteur.getId(),processedCapteur.getStatut(),processedCapteur.getPresence(),processedCapteur.getDetectionProbleme(),
+                    processedCapteur.getId(), processedCapteur.getStatut(), processedCapteur.getPresence(), processedCapteur.getDetectionProbleme() ,
                     processedRequest.getResult());
         }
     }
@@ -89,19 +89,25 @@ public class CapteurService {
         request.setRequestOrder(selectRequestOrder);
         objectMapper.enable(SerializationFeature.WRAP_ROOT_VALUE);
         final byte[] requestBytes = objectMapper.writerWithDefaultPrettyPrinter().writeValueAsBytes(request);
-        LoggingUtils.logDataMultiLine(logger, Level.TRACE, requestBytes);
+
+        logger.debug("Envoi de la requête SELECT_ALL_CAPTEURS avec ID {}", requestId);
 
         final SelectAllCapteursClientRequest capteurRequest = new SelectAllCapteursClientRequest(
                 networkConfig, 0, request, null, requestBytes);
         capteurRequests.push(capteurRequest);
 
+        logger.debug("Taille de capteurRequests : {}", capteurRequests.size());
+
         if (!capteurRequests.isEmpty()) {
             final ClientRequest joinedCapteurRequest = capteurRequests.pop();
             joinedCapteurRequest.join();
-            logger.debug("Thread {} terminé.", joinedCapteurRequest.getThreadName());
+            logger.debug(" Thread {} terminé.", joinedCapteurRequest.getThreadName());
 
-            Capteurs capteurs = (Capteurs) joinedCapteurRequest.getResult();
-            if (capteurs != null) {
+            Object result = joinedCapteurRequest.getResult();
+            logger.debug(" Résultat de getResult() : {}", result);
+
+            if (result instanceof Capteurs) {
+                Capteurs capteurs = (Capteurs) result;
                 logger.info(" {} capteurs récupérés.", capteurs.getCapteurs().size());
                 return capteurs;
             } else {
@@ -109,8 +115,13 @@ public class CapteurService {
                 return null;
             }
         } else {
-            logger.error(" Erreur : Aucun capteur récupéré.");
+            logger.error("Aucun capteur récupéré.");
             return null;
         }
     }
+
+    public Capteur getCapteur(String id) {
+        return null;
+    }
 }
+

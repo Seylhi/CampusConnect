@@ -27,19 +27,31 @@ public class CapteurUI {
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
 
-        // Créer un panel avec un layout vertical
+        // Appliquer un Layout pour positionner les boutons
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(2, 1, 10, 10));
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(10, 10, 10, 10); // Espacement entre les composants
 
         // Boutons pour afficher la liste des capteurs et ajouter un nouveau capteur
         JButton afficherButton = new JButton("Liste des Capteurs");
         JButton creerButton = new JButton("Créer Nouveau Capteur");
+        afficherButton.setPreferredSize(new Dimension(200, 50));
+        creerButton.setPreferredSize(new Dimension(200, 50));
+
+        // Positionnement des boutons avec GridBagLayout
+        gbc.gridx = 0;
+        gbc.gridy = 0;
+        panel.add(afficherButton, gbc);
+
+        gbc.gridx = 0;
+        gbc.gridy = 1;
+        panel.add(creerButton, gbc);
 
         // ActionListener pour afficher la liste des capteurs
         afficherButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Appeler la méthode pour afficher la liste des capteurs
                 afficherListeCapteurs();
             }
         });
@@ -48,19 +60,10 @@ public class CapteurUI {
         creerButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Ouvrir un formulaire pour créer un nouveau capteur
                 afficherFormulaireCreation();
             }
         });
-
-        // Ajouter les boutons au panel
-        panel.add(afficherButton);
-        panel.add(creerButton);
-
-        // Ajouter le panel à la fenêtre principale
         frame.add(panel);
-
-        // Afficher la fenêtre principale
         frame.setVisible(true);
     }
 
@@ -102,6 +105,8 @@ public class CapteurUI {
 
         // Ajout du bouton "Modifier"
         JButton modifierButton = new JButton("Modifier Capteur");
+        modifierButton.setPreferredSize(new Dimension(160, 40));
+
         modifierButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
             if (selectedRow == -1) {
@@ -123,8 +128,10 @@ public class CapteurUI {
             afficherFormulaireModification(capteur, tableModel, selectedRow);
         });
 
-        //Ajout du bouton "Supprimer"
+        // Ajout du bouton "Supprimer"
         JButton supprimerButton = new JButton("Supprimer Capteur");
+        supprimerButton.setPreferredSize(new Dimension(160, 40));
+
         supprimerButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
             if (selectedRow == -1) {
@@ -168,68 +175,90 @@ public class CapteurUI {
     private void afficherFormulaireCreation() {
         JFrame frame = new JFrame("Créer un Capteur");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
-        frame.setSize(400, 300);
+        frame.setSize(450, 350);
         frame.setLocationRelativeTo(null);
         frame.setLayout(new BorderLayout());
-        frame.setVisible(true);
 
-        // Panel pour contenir les champs du formulaire
+        // Panel principal avec un GridLayout
         JPanel panel = new JPanel();
-        panel.setLayout(new GridLayout(4, 2, 10, 10));
+        panel.setLayout(new GridLayout(5, 2, 10, 10)); // 5 lignes et 2 colonnes, avec des espaces entre les composants
 
-        // Champs pour saisir les informations du capteur
-        panel.add(new JLabel("ID Capteur :"));
-        JTextField idField = new JTextField();
+        // Ajout des labels et des champs de texte pour saisir les informations du capteur
+        JLabel idLabel = new JLabel("ID Capteur :");
+        JTextField idField = new JTextField(10);
+        JLabel statutLabel = new JLabel("Statut (Actif/Inactif) :");
+        String[] statutOptions = {"Actif", "Inactif"};
+        JComboBox<String> statutComboBox = new JComboBox<>(statutOptions);
+        statutComboBox.setPreferredSize(new Dimension(20, 20));
+        JLabel presenceLabel = new JLabel("Présence (Oui/Non) :");
+        String[] presenceOptions = {"Oui", "Non"};
+        JComboBox<String> presenceComboBox = new JComboBox<>(presenceOptions);
+        presenceComboBox.setPreferredSize(new Dimension(20, 20));
+        JLabel detectionLabel = new JLabel("Problème détecté (Oui/Non) :");
+        String[] detectionOptions = {"Oui", "Non"};
+        JComboBox<String> detectionComboBox = new JComboBox<>(detectionOptions);
+        detectionComboBox.setPreferredSize(new Dimension(20, 20));
+
+        // Ajouter les composants dans le panel avec GridLayout
+        panel.add(idLabel);
         panel.add(idField);
+        panel.add(statutLabel);
+        panel.add(statutComboBox);
+        panel.add(presenceLabel);
+        panel.add(presenceComboBox);
+        panel.add(detectionLabel);
+        panel.add(detectionComboBox);
 
-        panel.add(new JLabel("Statut (Actif/ Inactif) :"));
-        JTextField statutField = new JTextField();
-        panel.add(statutField);
-
-        panel.add(new JLabel("Présence (Oui/ Non) :"));
-        JTextField presenceField = new JTextField();
-        panel.add(presenceField);
-
-        panel.add(new JLabel("Problème détecté (Oui/ Non) :"));
-        JTextField detectionField = new JTextField();
-        panel.add(detectionField);
-
-        // Bouton pour valider la création
+        // Créer un bouton "Créer" avec une taille raisonnable
         JButton createButton = new JButton("Créer");
-        panel.add(createButton);
+        createButton.setPreferredSize(new Dimension(20, 20));
 
-        // ActionListener pour valider la création
+        // Ajouter un écouteur d'événements au bouton
         createButton.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // Récupérer les données des champs
                 String id = idField.getText();
-                boolean statut = "Actif".equals(statutField.getText());
-                boolean presence = "Oui".equals(presenceField.getText());
-                boolean detectionProbleme = "Oui".equals(detectionField.getText());
+                String statut = (String) statutComboBox.getSelectedItem();
+                String presence = (String) presenceComboBox.getSelectedItem();
+                String detection = (String) detectionComboBox.getSelectedItem();
 
-                // Créer un objet Capteur
-                Capteur capteur = new Capteur();
-                capteur.setId(id);
-                capteur.setStatut(statut);
-                capteur.setPresence(presence);
-                capteur.setDetectionProbleme(detectionProbleme);
-
-                // Appeler la méthode du service pour ajouter le capteur
+                // Vérifier si un capteur avec cet ID existe déjà
                 try {
+                    Capteurs capteurs = capteurService.selectCapteurs();
+                    boolean idExists = capteurs.getCapteurs().stream().anyMatch(capteur -> capteur.getId().equals(id));
+
+                    if (idExists) {
+                        JOptionPane.showMessageDialog(frame, "Un capteur avec cet ID existe déjà !", "Erreur", JOptionPane.ERROR_MESSAGE);
+                        return;
+                    }
+
+                    // Créer un objet Capteur
+                    Capteur capteur = new Capteur();
+                    capteur.setId(id);
+                    capteur.setStatut("Actif".equals(statut));
+                    capteur.setPresence("Oui".equals(presence));
+                    capteur.setDetectionProbleme("Oui".equals(detection));
+
+                    // Appeler la méthode du service pour ajouter le capteur
                     capteurService.insertCapteur(capteur);
                     JOptionPane.showMessageDialog(frame, "Capteur créé avec succès !");
                 } catch (InterruptedException | IOException ex) {
                     JOptionPane.showMessageDialog(frame, "Erreur lors de la création du capteur : " + ex.getMessage());
                 }
 
-                frame.dispose();  // Fermer le formulaire après création
+                frame.dispose(); // Fermer le formulaire après création
             }
         });
 
-        frame.add(panel);
+        // Ajouter le bouton à la fin du formulaire
+        panel.add(createButton);
+
+        // Ajouter le panel au JFrame
+        frame.add(panel, BorderLayout.CENTER);
         frame.setVisible(true);
     }
+
+
 
     private void afficherFormulaireModification(Capteur capteur, DefaultTableModel tableModel, int selectedRow) {
         JFrame frame = new JFrame("Modifier un Capteur");
@@ -257,6 +286,7 @@ public class CapteurUI {
         panel.add(detectionField);
 
         JButton updateButton = new JButton("Modifier");
+        updateButton.setPreferredSize(new Dimension(120, 40));
         panel.add(updateButton);
 
         updateButton.addActionListener(e -> {

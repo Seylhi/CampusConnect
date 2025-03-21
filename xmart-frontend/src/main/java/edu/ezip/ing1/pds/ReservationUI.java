@@ -117,7 +117,7 @@ public class ReservationUI {
                 return;
             }
 
-            String id = (String) tableModel.getValueAt(selectedRow, 0);
+            int id = (int) tableModel.getValueAt(selectedRow, 0);
             String nom = (String) tableModel.getValueAt(selectedRow, 1);
             Date date = (Date) tableModel.getValueAt(selectedRow, 2);
             String heureDebut = (String) tableModel.getValueAt(selectedRow, 3);
@@ -146,7 +146,7 @@ public class ReservationUI {
                 return;
             }
 
-            String id = (String) tableModel.getValueAt(selectedRow, 0);
+            int id = (int) tableModel.getValueAt(selectedRow, 0);
             String nom = (String) tableModel.getValueAt(selectedRow, 1);
 
             int confirm = JOptionPane.showConfirmDialog(frame,

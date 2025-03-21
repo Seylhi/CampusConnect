@@ -2,7 +2,6 @@ package edu.ezip.ing1.pds;
 
 import edu.ezip.ing1.pds.business.dto.Reservation;
 import edu.ezip.ing1.pds.business.dto.Reservations;
-import edu.ezip.ing1.pds.business.dto.Utilisateur;
 import edu.ezip.ing1.pds.client.commons.NetworkConfig;
 import edu.ezip.ing1.pds.services.ReservationService;
 
@@ -118,7 +117,7 @@ public class ReservationUI {
                 return;
             }
 
-            int id = (int) tableModel.getValueAt(selectedRow, 0);
+            String id = (String) tableModel.getValueAt(selectedRow, 0);
             String nom = (String) tableModel.getValueAt(selectedRow, 1);
             Date date = (Date) tableModel.getValueAt(selectedRow, 2);
             String heureDebut = (String) tableModel.getValueAt(selectedRow, 3);
@@ -138,7 +137,7 @@ public class ReservationUI {
             afficherFormulaireModification(reservation, tableModel, selectedRow);
         });
 
-        //Ajout du bouton "Supprimer"
+        // Ajout du bouton "Supprimer"
         JButton supprimerButton = new JButton("Supprimer Réservation");
         supprimerButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();
@@ -147,11 +146,11 @@ public class ReservationUI {
                 return;
             }
 
-            int id = (int) tableModel.getValueAt(selectedRow, 0);
-            String nomUtilisateur = (String) tableModel.getValueAt(selectedRow, 1);
+            String id = (String) tableModel.getValueAt(selectedRow, 0);
+            String nom = (String) tableModel.getValueAt(selectedRow, 1);
 
             int confirm = JOptionPane.showConfirmDialog(frame,
-                    "Voulez-vous vraiment supprimer l'utilisateur " + nomUtilisateur + " ?",
+                    "Voulez-vous vraiment supprimer la réservation " + nom + " ?",
                     "Confirmation",
                     JOptionPane.YES_NO_OPTION);
 
@@ -161,9 +160,9 @@ public class ReservationUI {
                     reservation.setId(id);
 
                     reservationService.deleteReservation(reservation);
-                    JOptionPane.showMessageDialog(frame, "Utilisateur supprimé avec succès !");
+                    JOptionPane.showMessageDialog(frame, "Réservation supprimée avec succès !");
 
-                    //Supprimer la ligne du tableau
+                    // Supprimer la ligne du tableau
                     tableModel.removeRow(selectedRow);
                 } catch (Exception ex) {
                     JOptionPane.showMessageDialog(frame, "Erreur lors de la suppression : " + ex.getMessage());

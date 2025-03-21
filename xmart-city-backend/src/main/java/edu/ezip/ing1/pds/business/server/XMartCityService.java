@@ -38,7 +38,10 @@ public class XMartCityService {
         INSERT_CAPTEUR("INSERT INTO Capteurs (id_capteur , statut, presence , detection_probleme) VALUES (?, ?, ?, ?)"),
         UPDATE_CAPTEUR("UPDATE Capteurs SET statut = ?, presence = ?, detection_probleme = ? WHERE id_capteur = ?"),
         DELETE_CAPTEUR("DELETE FROM Capteurs WHERE id_capteur = ?"),
-        SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations");
+        SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations"),
+        INSERT_RESERVATION("INSERT INTO Reservations (name, date,heuredeb, heurefin, type, description) VALUES (?, ?, ?, ?, ?, ?)"),
+        UPDATE_RESERVATION("UPDATE Reservations SET name = ?, date = ?, heuredeb = ?, heurefin = ?, type = ?, description = ? WHERE id = ?"),
+        DELETE_RESERVATION("DELETE FROM Reservations WHERE id = ?");
         private final String query;
 
         private Queries(final String query) {
@@ -100,7 +103,7 @@ public class XMartCityService {
             case SELECT_ALL_CAPTEURS:
                 response = selectAllCapteurs(request, connection);
                 break;
-           case INSERT_CAPTEUR:
+            case INSERT_CAPTEUR:
                 response = insertCapteur(request, connection);
                 break;
             case UPDATE_CAPTEUR:
@@ -112,8 +115,14 @@ public class XMartCityService {
             case SELECT_ALL_RESERVATIONS:
                 response = selectAllReservations(request, connection);
                 break;
-            /*case INSERT_RESERVATION:
+            case INSERT_RESERVATION:
                 response = insertReservation(request, connection);
+                break;
+            case UPDATE_RESERVATION:
+                response = updateReservation(request, connection);
+                break;
+            /*case DELETE_RESERVATION:
+                response = deleteReservation(request, connection);
                 break;*/
             default:
                 break;
@@ -224,7 +233,26 @@ public class XMartCityService {
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(capteur));
     }
+    private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
 
+        // ✅ Générer un ID unique si ID_notifs n'est pas fourni
+
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_RESERVATION.query);
+        stmt.setString(1, reservation.getName());
+        stmt.setDate(2, new java.sql.Date(reservation.getDate().getTime()));
+        stmt.setTime(3, reservation.getHeuredeb());
+        stmt.setTime(4, reservation.getHeurefin());
+        stmt.setString(5, reservation.getType());
+        stmt.setString(6, reservation.getDescription());
+
+
+        stmt.executeUpdate();
+
+        return new Response(request.getRequestId(), objectMapper.writeValueAsString(reservation));
+    }
     /*private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
@@ -389,18 +417,57 @@ public class XMartCityService {
         final Statement stmt = connection.createStatement();
         final ResultSet res = stmt.executeQuery(Queries.SELECT_ALL_RESERVATIONS.query);
         Reservations reservations = new Reservations();
+
         while (res.next()) {
             Reservation reservation = new Reservation();
-            reservation.setId(res.getString(1));
-            reservation.setName(res.getString(2));
-            reservation.setDate(Date.valueOf(res.getString(3)));
-            reservation.setHeuredeb(Time.valueOf(res.getString(4)));
-            reservation.setHeurefin(Time.valueOf(res.getString(5)));
-            reservation.setType(res.getString(6));
-            reservation.setDescription(res.getString(7));
+            reservation.setId(String.valueOf(res.getInt(9)));
+            reservation.setName(res.getString(1));
+            reservation.setDate(res.getDate(2));
+            reservation.setHeuredeb(res.getTime(3));
+            reservation.setHeurefin(res.getTime(4));
+            reservation.setType(res.getString(5));
+            reservation.setDescription(res.getString(6));
             reservations.add(reservation);
         }
+
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(reservations));
     }
 
+
+    private Response updateReservation(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_RESERVATION.query);
+        stmt.setString(1, reservation.getName());
+        stmt.setString(2, reservation.getDate().toString());
+        stmt.setString(3, reservation.getHeuredeb().toString());
+        stmt.setString(4, reservation.getHeurefin().toString());
+        stmt.setString(5, reservation.getType());
+        stmt.setString(6, reservation.getDescription());
+
+        int rowsUpdated = stmt.executeUpdate();
+
+        if (rowsUpdated == 0) {
+            return new Response(request.getRequestId(), "Utilisateur non trouvé ou aucune mise à jour effectuée.");
+        }
+
+        return new Response(request.getRequestId(), "Utilisateur mis à jour avec succès.");
+    }
+
+    /*private Response deleteReservation(final Request request, final Connection connection) throws SQLException, IOException {
+        final ObjectMapper objectMapper = new ObjectMapper();
+        final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
+
+        final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RESERVATION.query);
+        stmt.setString(1, reservation.getId());
+
+        int rowsDeleted = stmt.executeUpdate();
+
+        if (rowsDeleted == 0) {
+            return new Response(request.getRequestId(), "Reservation non trouvée ou déjà supprimée.");
+        }
+
+        return new Response(request.getRequestId(), "Reservation supprimée avec succès.");
+    }*/
 }

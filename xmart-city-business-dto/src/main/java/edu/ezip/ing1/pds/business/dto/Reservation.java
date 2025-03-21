@@ -12,7 +12,7 @@ import java.util.Date;
 
 @JsonRootName(value = "reservation")
 public class Reservation {
-    private int id;
+    private String id;
     private String name;
     private Date date;
     private Time heuredeb;
@@ -20,10 +20,20 @@ public class Reservation {
     private String type;
     private String description;
 
+
     public Reservation() {
     }
-
-    public Reservation(String name, Date date, Time heuredeb, Time heurefin, String type, String description) {
+    public final Reservation build(final ResultSet resultSet)
+            throws SQLException, NoSuchFieldException, IllegalAccessException {
+        setFieldsFromResultSet(resultSet, "id","name", "date","heuredeb", "heurefin", "type", "description");
+        return this;
+    }
+    public final PreparedStatement build(PreparedStatement preparedStatement)
+            throws SQLException, NoSuchFieldException, IllegalAccessException {
+        return buildPreparedStatement(preparedStatement,id, name,date.toString(),heuredeb.toString(),heurefin.toString(),type,description);
+    }
+    public Reservation(String id, String name,Date date,Time heuredeb, Time heurefin,String type, String description) {
+        this.id = id;
         this.name = name;
         this.date = date;
         this.heuredeb = heuredeb;
@@ -32,19 +42,8 @@ public class Reservation {
         this.description = description;
     }
 
-    public final Reservation build(final ResultSet resultSet)
-            throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResultSet(resultSet, "id", "name", "date", "heuredeb", "heurefin", "type", "description");
-        return this;
-    }
-
-    public final PreparedStatement build(PreparedStatement preparedStatement)
-            throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement, String.valueOf(id), name, date.toString(), heuredeb.toString(), heurefin.toString(), type, description);
-    }
-
-    public int getId() { return id; }
-    public String getName() { return name; }
+    public String getId() { return id; }
+    public String getName() {return name;}
     public Date getDate() { return date; }
     public Time getHeuredeb() { return heuredeb; }
     public Time getHeurefin() { return heurefin; }
@@ -52,7 +51,7 @@ public class Reservation {
     public String getDescription() { return description; }
 
     @JsonProperty("Id_resa")
-    public void setId(int id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -86,18 +85,18 @@ public class Reservation {
         this.description = description;
     }
 
-    private void setFieldsFromResultSet(final ResultSet resultSet, final String... fieldNames)
+    private void setFieldsFromResultSet(final ResultSet resultSet, final String ... fieldNames )
             throws NoSuchFieldException, SQLException, IllegalAccessException {
-        for (final String fieldName : fieldNames) {
+        for(final String fieldName : fieldNames ) {
             final Field field = this.getClass().getDeclaredField(fieldName);
             field.set(this, resultSet.getObject(fieldName));
         }
     }
 
-    private PreparedStatement buildPreparedStatement(PreparedStatement preparedStatement, final String... fieldValues)
+    private final PreparedStatement buildPreparedStatement(PreparedStatement preparedStatement, final String ... fieldValues )
             throws SQLException {
         int ix = 0;
-        for (final String fieldValue : fieldValues) {
+        for(final String fieldValue : fieldValues ) {
             preparedStatement.setString(++ix, fieldValue);
         }
         return preparedStatement;
@@ -105,14 +104,14 @@ public class Reservation {
 
     @Override
     public String toString() {
-        return "Reservation{" +
-                "id=" + id +
-                ", name='" + name + '\'' +
-                ", date=" + date +
-                ", heuredeb=" + heuredeb +
-                ", heurefin=" + heurefin +
-                ", type='" + type + '\'' +
-                ", description='" + description + '\'' +
+        return "Salle{" +
+                "id='" + id + '\'' +
+                "name='" + name + '\'' +
+                "date=" + date +
+                "heuredeb=" + heuredeb +
+                "heurefin=" + heurefin +
+                "type='" + type + '\'' +
+                "description='" + description + '\'' +
                 '}';
     }
 }

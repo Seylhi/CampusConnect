@@ -3,5 +3,5 @@ host: "172.31.249.176"
 port: 3306
 username : "root"
 password: "votre_mot_de_passe"
-poolSize: 2
+poolSize: 5
 

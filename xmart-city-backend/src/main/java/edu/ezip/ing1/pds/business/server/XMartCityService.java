@@ -39,9 +39,9 @@ public class XMartCityService {
         UPDATE_CAPTEUR("UPDATE Capteurs SET statut = ?, presence = ?, detection_probleme = ? WHERE id_capteur = ?"),
         DELETE_CAPTEUR("DELETE FROM Capteurs WHERE id_capteur = ?"),
         SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations"),
-        INSERT_RESERVATION("INSERT INTO Reservations (name, date,heuredeb, heurefin, type, description) VALUES (?, ?, ?, ?, ?, ?)"),
-        UPDATE_RESERVATION("UPDATE Reservations SET name = ?, date = ?, heuredeb = ?, heurefin = ?, type = ?, description = ? WHERE id = ?"),
-        DELETE_RESERVATION("DELETE FROM Reservations WHERE id = ?");
+        INSERT_RESERVATION("INSERT INTO Reservations (Name_resa, Date_resa, Heure_deb_resa, Heure_fin_resa , Type_resa, Description_resa) VALUES (?, ?, ?, ?, ?, ?)"),
+        UPDATE_RESERVATION("UPDATE Reservations SET Name_resa = ? , Date_resa = ? , Heure_deb_resa = ? , Heure_fin_resa = ? , Type_resa = ? , Description_resa = ? WHERE Id_resa = ?"),
+        DELETE_RESERVATION("DELETE FROM Reservations WHERE Id_resa = ?");
         private final String query;
 
         private Queries(final String query) {
@@ -121,9 +121,9 @@ public class XMartCityService {
             case UPDATE_RESERVATION:
                 response = updateReservation(request, connection);
                 break;
-            /*case DELETE_RESERVATION:
+            case DELETE_RESERVATION:
                 response = deleteReservation(request, connection);
-                break;*/
+                break;
             default:
                 break;
 
@@ -236,8 +236,6 @@ public class XMartCityService {
     private Response insertReservation(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
-
-        // ✅ Générer un ID unique si ID_notifs n'est pas fourni
 
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_RESERVATION.query);
@@ -420,13 +418,14 @@ public class XMartCityService {
 
         while (res.next()) {
             Reservation reservation = new Reservation();
-            reservation.setId(String.valueOf(res.getInt(9)));
+
             reservation.setName(res.getString(1));
             reservation.setDate(res.getDate(2));
             reservation.setHeuredeb(res.getTime(3));
             reservation.setHeurefin(res.getTime(4));
             reservation.setType(res.getString(5));
             reservation.setDescription(res.getString(6));
+            reservation.setId(res.getInt(9));
             reservations.add(reservation);
         }
 
@@ -438,7 +437,7 @@ public class XMartCityService {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
 
-        final PreparedStatement stmt = connection.prepareStatement(Queries.INSERT_RESERVATION.query);
+        final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_RESERVATION.query);
         stmt.setString(1, reservation.getName());
         stmt.setString(2, reservation.getDate().toString());
         stmt.setString(3, reservation.getHeuredeb().toString());
@@ -455,12 +454,13 @@ public class XMartCityService {
         return new Response(request.getRequestId(), "Utilisateur mis à jour avec succès.");
     }
 
-    /*private Response deleteReservation(final Request request, final Connection connection) throws SQLException, IOException {
+    private Response deleteReservation(final Request request, final Connection connection) throws SQLException, IOException {
         final ObjectMapper objectMapper = new ObjectMapper();
         final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RESERVATION.query);
-        stmt.setString(1, reservation.getId());
+        stmt.setInt(9, reservation.getId());
+
 
         int rowsDeleted = stmt.executeUpdate();
 
@@ -469,5 +469,5 @@ public class XMartCityService {
         }
 
         return new Response(request.getRequestId(), "Reservation supprimée avec succès.");
-    }*/
+    }
 }

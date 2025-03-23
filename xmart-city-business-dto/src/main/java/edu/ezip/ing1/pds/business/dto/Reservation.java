@@ -12,7 +12,7 @@ import java.util.Date;
 
 @JsonRootName(value = "reservation")
 public class Reservation {
-    private String id;
+    private int id;
     private String name;
     private Date date;
     private Time heuredeb;
@@ -25,14 +25,14 @@ public class Reservation {
     }
     public final Reservation build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResultSet(resultSet, "id","name", "date","heuredeb", "heurefin", "type", "description");
+        setFieldsFromResultSet(resultSet, "Id_resa","Name_resa", "Date_resa", "Heure_deb_resa", "Heure_fin_resa" , "Type_resa", "Description_resa");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        return buildPreparedStatement(preparedStatement,id, name,date.toString(),heuredeb.toString(),heurefin.toString(),type,description);
+        return buildPreparedStatement(preparedStatement, String.valueOf(id), name,date.toString(),heuredeb.toString(),heurefin.toString(),type,description);
     }
-    public Reservation(String id, String name,Date date,Time heuredeb, Time heurefin,String type, String description) {
+    public Reservation(int id, String name,Date date,Time heuredeb, Time heurefin,String type, String description) {
         this.id = id;
         this.name = name;
         this.date = date;
@@ -42,7 +42,7 @@ public class Reservation {
         this.description = description;
     }
 
-    public String getId() { return id; }
+    public int getId() { return id; }
     public String getName() {return name;}
     public Date getDate() { return date; }
     public Time getHeuredeb() { return heuredeb; }
@@ -51,7 +51,7 @@ public class Reservation {
     public String getDescription() { return description; }
 
     @JsonProperty("Id_resa")
-    public void setId(String id) {
+    public void setId(int id) {
         this.id = id;
     }
 

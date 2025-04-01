@@ -120,8 +120,8 @@ public class ReservationUI {
             int id = (int) tableModel.getValueAt(selectedRow, 0);
             String nom = (String) tableModel.getValueAt(selectedRow, 1);
             Date date = (Date) tableModel.getValueAt(selectedRow, 2);
-            String heureDebut = (String) tableModel.getValueAt(selectedRow, 3);
-            String heureFin = (String) tableModel.getValueAt(selectedRow, 4);
+            Time heureDebut = (Time) tableModel.getValueAt(selectedRow, 3);
+            Time heureFin = (Time) tableModel.getValueAt(selectedRow, 4);
             String type = (String) tableModel.getValueAt(selectedRow, 5);
             String description = (String) tableModel.getValueAt(selectedRow, 6);
 
@@ -129,8 +129,8 @@ public class ReservationUI {
             reservation.setId(id);
             reservation.setName(nom);
             reservation.setDate(date);
-            reservation.setHeuredeb(Time.valueOf(heureDebut));
-            reservation.setHeurefin(Time.valueOf(heureFin));
+            reservation.setHeuredeb(Time.valueOf(String.valueOf(heureDebut)));
+            reservation.setHeurefin(Time.valueOf(String.valueOf(heureFin)));
             reservation.setType(type);
             reservation.setDescription(description);
 

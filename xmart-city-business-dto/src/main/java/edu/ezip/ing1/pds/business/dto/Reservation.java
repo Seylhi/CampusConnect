@@ -25,7 +25,7 @@ public class Reservation {
     }
     public final Reservation build(final ResultSet resultSet)
             throws SQLException, NoSuchFieldException, IllegalAccessException {
-        setFieldsFromResultSet(resultSet, "Id_resa","Name_resa", "Date_resa", "Heure_deb_resa", "Heure_fin_resa" , "Type_resa", "Description_resa");
+        setFieldsFromResultSet(resultSet, "Name_resa", "Date_resa", "Heure_deb_resa", "Heure_fin_resa" , "Type_resa", "Description_resa","Id_resa");
         return this;
     }
     public final PreparedStatement build(PreparedStatement preparedStatement)
@@ -49,11 +49,6 @@ public class Reservation {
     public Time getHeurefin() { return heurefin; }
     public String getType() { return type; }
     public String getDescription() { return description; }
-
-    @JsonProperty("Id_resa")
-    public void setId(int id) {
-        this.id = id;
-    }
 
     @JsonProperty("Name_resa")
     public void setName(String name) {
@@ -83,6 +78,13 @@ public class Reservation {
     @JsonProperty("Description_resa")
     public void setDescription(String description) {
         this.description = description;
+
+
+    }
+
+    @JsonProperty("Id_resa")
+    public void setId(int id) {
+        this.id = id;
     }
 
     private void setFieldsFromResultSet(final ResultSet resultSet, final String ... fieldNames )

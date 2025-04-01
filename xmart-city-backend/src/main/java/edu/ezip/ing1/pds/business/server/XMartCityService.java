@@ -40,7 +40,7 @@ public class XMartCityService {
         DELETE_CAPTEUR("DELETE FROM Capteurs WHERE id_capteur = ?"),
         SELECT_ALL_RESERVATIONS("SELECT * FROM Reservations"),
         INSERT_RESERVATION("INSERT INTO Reservations (Name_resa, Date_resa, Heure_deb_resa, Heure_fin_resa , Type_resa, Description_resa) VALUES (?, ?, ?, ?, ?, ?)"),
-        UPDATE_RESERVATION("UPDATE Reservations SET Name_resa = ? , Date_resa = ? , Heure_deb_resa = ? , Heure_fin_resa = ? , Type_resa = ? , Description_resa = ? WHERE Id_resa = ?"),
+        UPDATE_RESERVATION ("UPDATE Reservations SET Name_resa = ?, Date_resa = ?, Heure_deb_resa = ?, Heure_fin_resa = ?, Type_resa = ?, Description_resa = ? WHERE Id_resa = ?"),
         DELETE_RESERVATION("DELETE FROM Reservations WHERE Id_resa = ?");
         private final String query;
 
@@ -245,8 +245,6 @@ public class XMartCityService {
         stmt.setTime(4, reservation.getHeurefin());
         stmt.setString(5, reservation.getType());
         stmt.setString(6, reservation.getDescription());
-
-
         stmt.executeUpdate();
 
         return new Response(request.getRequestId(), objectMapper.writeValueAsString(reservation));
@@ -425,7 +423,7 @@ public class XMartCityService {
             reservation.setHeurefin(res.getTime(4));
             reservation.setType(res.getString(5));
             reservation.setDescription(res.getString(6));
-            reservation.setId(res.getInt(9));
+            reservation.setId(res.getInt(7));
             reservations.add(reservation);
         }
 
@@ -439,19 +437,20 @@ public class XMartCityService {
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.UPDATE_RESERVATION.query);
         stmt.setString(1, reservation.getName());
-        stmt.setString(2, reservation.getDate().toString());
+        stmt.setDate(2, new java.sql.Date(reservation.getDate().getTime()));
         stmt.setString(3, reservation.getHeuredeb().toString());
         stmt.setString(4, reservation.getHeurefin().toString());
         stmt.setString(5, reservation.getType());
         stmt.setString(6, reservation.getDescription());
+        stmt.setString(7, String.valueOf(reservation.getId()));
 
         int rowsUpdated = stmt.executeUpdate();
 
         if (rowsUpdated == 0) {
-            return new Response(request.getRequestId(), "Utilisateur non trouvé ou aucune mise à jour effectuée.");
+            return new Response(request.getRequestId(), "Reservation non trouvée ou aucune mise à jour effectuée.");
         }
 
-        return new Response(request.getRequestId(), "Utilisateur mis à jour avec succès.");
+        return new Response(request.getRequestId(), "Reservation mise à jour avec succès.");
     }
 
     private Response deleteReservation(final Request request, final Connection connection) throws SQLException, IOException {
@@ -459,7 +458,7 @@ public class XMartCityService {
         final Reservation reservation = objectMapper.readValue(request.getRequestBody(), Reservation.class);
 
         final PreparedStatement stmt = connection.prepareStatement(Queries.DELETE_RESERVATION.query);
-        stmt.setInt(9, reservation.getId());
+        stmt.setInt(1, reservation.getId());
 
 
         int rowsDeleted = stmt.executeUpdate();

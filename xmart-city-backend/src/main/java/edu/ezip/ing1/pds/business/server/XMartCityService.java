@@ -423,7 +423,7 @@ public class XMartCityService {
             reservation.setHeurefin(res.getTime(4));
             reservation.setType(res.getString(5));
             reservation.setDescription(res.getString(6));
-            reservation.setId(res.getInt(7));
+            reservation.setId(res.getInt(9));
             reservations.add(reservation);
         }
 

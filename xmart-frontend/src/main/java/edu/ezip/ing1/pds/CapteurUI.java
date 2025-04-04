@@ -22,7 +22,7 @@ public class CapteurUI {
 
     public void afficherCapteurs(Capteurs capteurs) {
         // Créer la fenêtre principale avec les boutons nécessaires
-        JFrame frame = new JFrame("Gestion des Capteurs");
+        JFrame frame = new JFrame("Gestion des Capteurs.");
         frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.setSize(800, 600);
         frame.setLocationRelativeTo(null);
